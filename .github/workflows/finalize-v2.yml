@@ -22,8 +22,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          cat .stage/v2/01.b64 .stage/v2/02.b64 .stage/v2/03.b64 .stage/v2/04.b64 | tr -d '\r\n ' | base64 --decode > index.html
+          cat .stage/raw/01.part .stage/raw/02.part .stage/raw/03.part .stage/raw/04.part .stage/raw/05.part > index.html
           test -s index.html
+          echo '19e9a2721819942915f8d4f805a6bc015361813ce11c9163e8c37e660986ba48  index.html' | sha256sum -c -
           grep -q '<!-- Version 2 -->' index.html
           grep -q 'Xweather API Key' index.html
           grep -q 'function parseCombinedKey' index.html
