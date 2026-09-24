@@ -1,0 +1,73 @@
+name: Finalize PWS v3
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/finalize-v3.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Rebuild, back up, and validate production site
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p backups/v2
+          cp index.html backups/v2/index.html
+          cat .stage/v3/01.b64 .stage/v3/02.b64 .stage/v3/03.b64 .stage/v3/04.b64 .stage/v3/05.b64 .stage/v3/06.b64 .stage/v3/07.b64 | tr -d '\r\n ' | base64 --decode > /tmp/index-v3.html
+          test -s /tmp/index-v3.html
+          echo '089b860905c25a853772435461b1d2c6d3f631a13fe1800a1fb35b4569470710  /tmp/index-v3.html' | sha256sum -c -
+          grep -q '<!-- Version 3 -->' /tmp/index-v3.html
+          grep -q 'id="log"' /tmp/index-v3.html
+          grep -q 'function copyDiagnostics' /tmp/index-v3.html
+          grep -q "'MID_1905W', '1905W'" /tmp/index-v3.html
+          grep -q "'MID_1906W', '1906W'" /tmp/index-v3.html
+          grep -q "'MID_1789W', '1789W'" /tmp/index-v3.html
+          grep -q "'MID_1832W', '1832W'" /tmp/index-v3.html
+          grep -q "filter: 'allstations'" /tmp/index-v3.html
+          ! grep -q "filter: 'allstations,precise'" /tmp/index-v3.html
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, subprocess, tempfile
+          text = Path('/tmp/index-v3.html').read_text(encoding='utf-8')
+          assert text.count('id="log"') == 1
+          assert text.count('id="apiKey"') == 1
+          assert 'id="cid"' not in text
+          assert 'id="secret"' not in text
+          assert 'client_id: credentials.id' in text
+          assert 'client_secret: credentials.secret' in text
+          assert 'diagnostic_cop' in text
+          assert 'station_normalization' in text
+          m = re.search(r'<script>(.*?)</script>', text, re.S)
+          assert m, 'inline script not found'
+          with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False) as f:
+              f.write(m.group(1))
+              js = f.name
+          subprocess.run(['node', '--check', js], check=True)
+          PY
+          mv /tmp/index-v3.html index.html
+          test "$(git hash-object backups/v2/index.html)" = '282978068ff53813e6ac9e623aceff4826adbec7'
+
+      - name: Commit final site and remove temporary staging
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .stage
+          rm -f .github/workflows/finalize-v3.yml
+          rmdir .github/workflows 2>/dev/null || true
+          rmdir .github 2>/dev/null || true
+          git config user.name 'llm-i-am'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Fix Xweather station aliases and add diagnostics'
+          git push origin HEAD:main
