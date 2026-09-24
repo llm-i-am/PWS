@@ -1,1 +1,1884 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#eef7ff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#07111c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="format-detection" content="telephone=no">
 
+  <title>Honeymoon Island Tides</title>
+  <!-- Version 12 -->
+  <meta name="description" content="High and low tide predictions for NOAA station 8726809 — Honeymoon Island, Inside, Florida.">
+
+  <style>
+    :root {
+      color-scheme: light dark;
+      --page: #eef7ff;
+      --page-2: #f8fbff;
+      --ink: #0d1722;
+      --muted: rgba(13, 23, 34, .62);
+      --faint: rgba(13, 23, 34, .42);
+      --hairline: rgba(13, 23, 34, .10);
+      --hairline-strong: rgba(13, 23, 34, .16);
+      --surface: rgba(255, 255, 255, .74);
+      --surface-solid: rgba(255, 255, 255, .94);
+      --glass: rgba(255, 255, 255, .56);
+      --glass-strong: rgba(255, 255, 255, .74);
+      --field: rgba(255, 255, 255, .72);
+      --accent: #007aff;
+      --accent-2: #46b8ff;
+      --accent-soft: rgba(0, 122, 255, .12);
+      --green: #28a745;
+      --warning: #b46a00;
+      --danger: #c92a2a;
+      --shadow: 0 18px 60px rgba(15, 54, 86, .12), 0 2px 10px rgba(15, 54, 86, .06);
+      --radius-xl: 30px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 14px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-right: env(safe-area-inset-right, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left: env(safe-area-inset-left, 0px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --page: #07111c;
+        --page-2: #0a1725;
+        --ink: #f4f8fb;
+        --muted: rgba(244, 248, 251, .67);
+        --faint: rgba(244, 248, 251, .44);
+        --hairline: rgba(255, 255, 255, .10);
+        --hairline-strong: rgba(255, 255, 255, .18);
+        --surface: rgba(14, 29, 45, .72);
+        --surface-solid: rgba(14, 29, 45, .95);
+        --glass: rgba(20, 38, 56, .58);
+        --glass-strong: rgba(20, 38, 56, .78);
+        --field: rgba(255, 255, 255, .075);
+        --accent: #0a84ff;
+        --accent-2: #64d2ff;
+        --accent-soft: rgba(10, 132, 255, .18);
+        --green: #30d158;
+        --warning: #ffb340;
+        --danger: #ff6961;
+        --shadow: 0 22px 70px rgba(0, 0, 0, .32), 0 2px 12px rgba(0, 0, 0, .18);
+      }
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      min-width: 100%;
+      min-height: 100%;
+      background: var(--page);
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-width: 100%;
+      min-height: 100svh;
+      color: var(--ink);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, sans-serif;
+      font-synthesis: none;
+      -webkit-font-smoothing: antialiased;
+      background:
+        radial-gradient(1100px 620px at 8% -10%, rgba(80, 200, 255, .24), transparent 58%),
+        radial-gradient(900px 560px at 105% 4%, rgba(144, 255, 210, .17), transparent 56%),
+        linear-gradient(180deg, var(--page-2), var(--page));
+      overscroll-behavior-y: none;
+    }
+
+    button, input { font: inherit; }
+    button, a, input { -webkit-tap-highlight-color: transparent; }
+    button { touch-action: manipulation; }
+    a { color: var(--accent); text-underline-offset: 3px; }
+
+    .ambient {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: -1;
+    }
+
+    .ambient::before,
+    .ambient::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      filter: blur(50px);
+      opacity: .34;
+    }
+
+    .ambient::before {
+      width: 260px;
+      height: 260px;
+      left: -100px;
+      top: 18vh;
+      background: rgba(49, 188, 255, .42);
+    }
+
+    .ambient::after {
+      width: 280px;
+      height: 280px;
+      right: -130px;
+      top: 48vh;
+      background: rgba(85, 221, 181, .32);
+    }
+
+    .app {
+      width: min(100%, 980px);
+      margin: 0 auto;
+      padding:
+        calc(18px + var(--safe-top))
+        max(16px, calc(16px + var(--safe-right)))
+        calc(34px + var(--safe-bottom))
+        max(16px, calc(16px + var(--safe-left)));
+    }
+
+    .hero {
+      padding: 9px 4px 18px;
+    }
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      margin-bottom: 8px;
+    }
+
+    .station-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 5px var(--accent-soft);
+      flex: 0 0 auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(32px, 9vw, 52px);
+      line-height: .98;
+      letter-spacing: -.045em;
+      font-weight: 790;
+    }
+
+    .hero p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.45;
+      max-width: 680px;
+    }
+
+    .glass {
+      background: var(--glass);
+      border: 1px solid rgba(255,255,255,.44);
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.36);
+      -webkit-backdrop-filter: blur(24px) saturate(155%);
+      backdrop-filter: blur(24px) saturate(155%);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .glass {
+        border-color: rgba(255,255,255,.10);
+        box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,.08);
+      }
+    }
+
+    .controls {
+      border-radius: var(--radius-xl);
+      padding: 14px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .quick-range {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      padding: 4px;
+      border-radius: 16px;
+      background: rgba(127,127,127,.10);
+      border: 1px solid var(--hairline);
+      margin-bottom: 12px;
+    }
+
+    .quick-range button {
+      min-height: 40px;
+      border: 0;
+      border-radius: 12px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 14px;
+      font-weight: 720;
+      cursor: pointer;
+    }
+
+    .quick-range button[aria-pressed="true"] {
+      color: var(--ink);
+      background: var(--glass-strong);
+      box-shadow: 0 1px 7px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.34);
+    }
+
+    .table-filter {
+      margin: 0 20px 14px;
+    }
+
+    .date-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .date-field {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
+    }
+
+    .date-field span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 720;
+      padding-left: 4px;
+    }
+
+    input[type="date"] {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      min-height: 49px;
+      padding: 10px 8px;
+      border-radius: 15px;
+      border: 1px solid var(--hairline);
+      color: var(--ink);
+      background: var(--field);
+      font-size: 16px; /* prevents iOS Safari focus zoom */
+      font-weight: 650;
+      outline: none;
+      overflow: hidden;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input[type="date"]::-webkit-date-and-time-value {
+      min-width: 0;
+      margin: 0;
+      text-align: center;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      margin: 0;
+      padding: 0;
+    }
+
+    input[type="date"]:focus-visible {
+      border-color: color-mix(in srgb, var(--accent) 65%, transparent);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+
+    .apply-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .primary-button {
+      min-height: 50px;
+      flex: 1 1 auto;
+      border: 0;
+      border-radius: 16px;
+      padding: 0 18px;
+      color: white;
+      background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 90%, white), var(--accent));
+      box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 26%, transparent), inset 0 1px 0 rgba(255,255,255,.42);
+      font-weight: 760;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .primary-button:active { transform: scale(.985); }
+    .primary-button:disabled { opacity: .58; cursor: default; transform: none; }
+
+    .icon-button {
+      width: 50px;
+      height: 50px;
+      flex: 0 0 50px;
+      border: 1px solid var(--hairline);
+      border-radius: 16px;
+      background: var(--field);
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .icon-button svg { width: 21px; height: 21px; }
+
+    .status {
+      min-height: 25px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: 12px 4px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 25px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 760;
+    }
+
+    .status-pill::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .status-pill.proxy { color: var(--warning); background: color-mix(in srgb, var(--warning) 12%, transparent); }
+    .status-pill.cached { color: var(--muted); background: rgba(127,127,127,.10); }
+
+    .notice {
+      display: none;
+      margin-top: 14px;
+      padding: 14px 15px;
+      border-radius: var(--radius-md);
+      border: 1px solid color-mix(in srgb, var(--danger) 22%, transparent);
+      background: color-mix(in srgb, var(--danger) 8%, var(--surface-solid));
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .notice.show { display: block; }
+    .notice strong { display: block; margin-bottom: 4px; }
+
+    .content-stack {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--hairline);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 8px 36px rgba(20, 62, 92, .07);
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 20px 20px 12px;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 21px;
+      letter-spacing: -.025em;
+      font-weight: 780;
+    }
+
+    .card-subtitle {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .range-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      padding-top: 4px;
+    }
+
+    .chart-wrap {
+      position: relative;
+      min-height: 270px;
+      padding: 0 8px 6px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    #chart {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+    }
+
+    .chart-empty {
+      min-height: 270px;
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+      padding: 32px;
+    }
+
+
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--hairline);
+      border-top: 1px solid var(--hairline);
+    }
+
+    .summary-cell {
+      min-width: 0;
+      background: var(--surface-solid);
+      padding: 14px 14px 15px;
+    }
+
+    .summary-label {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    .summary-cell strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 17px;
+      letter-spacing: -.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .summary-meta {
+      display: grid;
+      gap: 1px;
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1.25;
+      letter-spacing: -.005em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .summary-meta span {
+      display: block;
+      white-space: nowrap;
+    }
+
+    .table-shell {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 8px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 540px;
+      border-collapse: collapse;
+      font-variant-numeric: tabular-nums;
+    }
+
+    th, td {
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--hairline);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .045em;
+      font-weight: 760;
+      background: color-mix(in srgb, var(--surface-solid) 86%, transparent);
+    }
+
+    td { font-size: 15px; }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .date-cell strong { display: block; font-size: 14px; }
+    .date-cell span { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .number { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+    .tide-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      color: var(--accent);
+      background: var(--accent-soft);
+      font-size: 12px;
+      font-weight: 780;
+    }
+
+    .tide-badge.low {
+      color: color-mix(in srgb, var(--accent-2) 80%, var(--ink));
+      background: color-mix(in srgb, var(--accent-2) 12%, transparent);
+    }
+
+    .tide-arrow {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border: solid currentColor;
+      border-width: 0 2px 2px 0;
+    }
+
+    .tide-badge.high .tide-arrow { transform: rotate(225deg) translate(-1px, -1px); }
+    .tide-badge.low .tide-arrow { transform: rotate(45deg) translate(-1px, -1px); }
+
+    .loading {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loading::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      transform: translateX(-100%);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+      animation: shimmer 1.2s infinite;
+      pointer-events: none;
+    }
+
+    @keyframes shimmer { to { transform: translateX(100%); } }
+
+    .footer {
+      padding: 20px 6px 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      margin-top: 9px;
+    }
+
+    .footer a { font-weight: 700; text-decoration: none; }
+
+    .sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0,0,0,0) !important;
+      white-space: nowrap !important;
+      border: 0 !important;
+    }
+
+    @media (max-width: 560px) {
+      table { min-width: 100%; }
+      th, td { padding: 12px 7px; }
+      th:first-child, td:first-child { padding-left: 14px; }
+      th:last-child, td:last-child { padding-right: 14px; }
+      th { font-size: 10px; }
+      td { font-size: 13.5px; }
+      .date-cell strong { font-size: 12.5px; }
+      .date-cell span { font-size: 11px; }
+      .tide-badge { padding: 5px 7px; font-size: 11px; }
+    }
+
+    @media (min-width: 700px) {
+      .app { padding-left: 28px; padding-right: 28px; }
+      .controls { padding: 16px; }
+      .controls-inner {
+        display: grid;
+        grid-template-columns: 280px minmax(320px, 1fr);
+        gap: 14px;
+        align-items: end;
+      }
+      .quick-range { margin: 0; }
+      .date-actions {
+        display: grid;
+        grid-template-columns: minmax(0,1fr) auto;
+        gap: 10px;
+        align-items: end;
+      }
+      .apply-row { margin: 0; }
+      .primary-button { min-width: 130px; }
+      .content-stack { gap: 20px; }
+      .card-header { padding: 22px 24px 14px; }
+      .table-filter { margin: 0 24px 16px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+      }
+    }
+
+    @media (prefers-contrast: more) {
+      :root {
+        --hairline: rgba(0,0,0,.28);
+        --hairline-strong: rgba(0,0,0,.42);
+        --surface: rgba(255,255,255,.96);
+        --glass: rgba(255,255,255,.93);
+      }
+    }
+
+    @media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+      :root {
+        --hairline: rgba(255,255,255,.30);
+        --hairline-strong: rgba(255,255,255,.44);
+        --surface: rgba(10,20,32,.97);
+        --glass: rgba(10,20,32,.95);
+      }
+    }
+
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+      .glass { background: var(--surface-solid); }
+    }
+  </style>
+</head>
+<body>
+  <div class="ambient" aria-hidden="true"></div>
+
+  <main class="app">
+    <header class="hero">
+      <div class="eyebrow"><span class="station-dot"></span> NOAA station 8726809</div>
+      <h1>Honeymoon Island Tides</h1>
+    </header>
+
+    <section class="controls glass" aria-label="Tide date range">
+      <div class="controls-inner">
+        <div class="quick-range" role="group" aria-label="Quick date ranges">
+          <button type="button" data-days="1">Today</button>
+          <button type="button" data-days="3">3 Days</button>
+          <button type="button" data-days="7">7 Days</button>
+        </div>
+
+        <div class="date-actions">
+          <div class="date-grid">
+            <label class="date-field">
+              <span>Start</span>
+              <input id="startDate" type="date" aria-label="Start date">
+            </label>
+            <label class="date-field">
+              <span>End</span>
+              <input id="endDate" type="date" aria-label="End date">
+            </label>
+          </div>
+
+          <div class="apply-row">
+            <button id="loadButton" class="primary-button" type="button">Show tides</button>
+            <button id="refreshButton" class="icon-button" type="button" aria-label="Refresh from NOAA" title="Refresh from NOAA">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M20 11a8 8 0 1 0-2.3 5.7"></path>
+                <path d="M20 4v7h-7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div id="status" class="status" aria-live="polite"></div>
+      <div id="notice" class="notice" role="alert"></div>
+    </section>
+
+    <div class="content-stack">
+      <section class="card" aria-labelledby="chartTitle">
+        <div class="card-header">
+          <div>
+            <h2 id="chartTitle" class="card-title">Tide curve</h2>
+            <p class="card-subtitle">Official NOAA high/low predictions, with a smooth visual curve between them.</p>
+          </div>
+          <div id="rangeLabel" class="range-label"></div>
+        </div>
+
+        <div id="chartWrap" class="chart-wrap">
+          <div class="chart-empty">Loading NOAA tide predictions…</div>
+        </div>
+
+
+        <div class="summary-strip" aria-label="Range summary">
+          <div class="summary-cell">
+            <span class="summary-label">Highest</span>
+            <strong id="highestValue">—</strong>
+            <div id="highestMeta" class="summary-meta">—</div>
+          </div>
+          <div class="summary-cell">
+            <span class="summary-label">Lowest</span>
+            <strong id="lowestValue">—</strong>
+            <div id="lowestMeta" class="summary-meta">—</div>
+          </div>
+          <div class="summary-cell">
+            <span class="summary-label">Tides</span>
+            <strong id="tideCount">—</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="tableTitle">
+        <div class="card-header">
+          <div>
+            <h2 id="tableTitle" class="card-title">High & low tides</h2>
+            <p class="card-subtitle">MLLW · feet · LST/LDT</p>
+          </div>
+        </div>
+
+        <div class="quick-range table-filter" role="group" aria-label="Filter tide table">
+          <button type="button" data-tide-filter="both" aria-pressed="true">High &amp; Low</button>
+          <button type="button" data-tide-filter="high" aria-pressed="false">High</button>
+          <button type="button" data-tide-filter="low" aria-pressed="false">Low</button>
+        </div>
+
+        <div class="table-shell">
+          <table>
+            <caption class="sr-only">NOAA tide predictions for station 8726809</caption>
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Time</th>
+                <th scope="col">Height</th>
+                <th scope="col">Tide</th>
+              </tr>
+            </thead>
+            <tbody id="tideRows">
+              <tr><td colspan="4" style="color:var(--muted);">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      Data source: NOAA/NOS/CO-OPS. Station 8726809 is a subordinate tide-prediction station referenced to Clearwater Beach (8726724). Predictions are not real-time water-level observations and are not for navigation.
+      <div class="footer-links">
+        <a id="officialPageLink" target="_blank" rel="noopener noreferrer">Open official NOAA page ↗</a>
+        <a id="apiLink" target="_blank" rel="noopener noreferrer">View NOAA JSON ↗</a>
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    (() => {
+      'use strict';
+
+      /* ----------------------------
+         Fixed station configuration
+         ---------------------------- */
+      const STATION_ID = '8726809';
+      const STATION_NAME = 'HONEYMOON ISLAND, INSIDE, FL';
+      const STATION_TZ = 'America/New_York';
+      const DATUM = 'MLLW';
+      const MAX_DAYS = 31;
+      const CACHE_TTL_MS = 5 * 60 * 1000;
+      const APP_NAME = 'HoneymoonIslandTides_GitHubPages';
+      const QUICK_RANGE_KEY = 'hi-tides:quick-range-days';
+      const CUSTOM_RANGE_KEY = 'hi-tides:custom-range';
+      const RANGE_RESET_DAY_KEY = 'hi-tides:range-reset-day';
+
+      const NOAA_API_BASE = 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter';
+      const NOAA_TAC_API_BASE = 'https://tidesandcurrents.noaa.gov/api/datagetter';
+      const NOAA_PAGE_BASE = 'https://tidesandcurrents.noaa.gov/noaatidepredictions.html';
+      const ALLORIGINS_RAW = 'https://api.allorigins.win/raw?url=';
+      const CORSPROXY_IO = 'https://corsproxy.io/?url=';
+
+      const el = {
+        start: document.getElementById('startDate'),
+        end: document.getElementById('endDate'),
+        load: document.getElementById('loadButton'),
+        refresh: document.getElementById('refreshButton'),
+        status: document.getElementById('status'),
+        notice: document.getElementById('notice'),
+        chartWrap: document.getElementById('chartWrap'),
+        rows: document.getElementById('tideRows'),
+        rangeLabel: document.getElementById('rangeLabel'),
+        highest: document.getElementById('highestValue'),
+        highestMeta: document.getElementById('highestMeta'),
+        lowest: document.getElementById('lowestValue'),
+        lowestMeta: document.getElementById('lowestMeta'),
+        count: document.getElementById('tideCount'),
+        officialLink: document.getElementById('officialPageLink'),
+        apiLink: document.getElementById('apiLink'),
+        quickButtons: [...document.querySelectorAll('[data-days]')],
+        tideFilterButtons: [...document.querySelectorAll('[data-tide-filter]')]
+      };
+
+      const state = {
+        allPoints: [],
+        visiblePoints: [],
+        startISO: '',
+        endISO: '',
+        source: '',
+        abortController: null,
+        nowTimer: null,
+        resizeTimer: null,
+        rolloverTimer: null,
+        stationDay: '',
+        tableFilter: 'both',
+        // null means the capsule is attached to the live station-local time.
+        // A numeric stamp means the user has scrubbed to a specific minute.
+        probeStamp: null,
+        probeDragging: false
+      };
+
+      /* ----------------------------
+         Date helpers
+         NOAA LST/LDT values are civil station time. For chart math we deliberately
+         place those civil components on a UTC-like numeric axis, so a visitor's own
+         browser timezone cannot shift the NOAA timestamps.
+         ---------------------------- */
+      function validISODate(s) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(s || '')) return false;
+        const [y, m, d] = s.split('-').map(Number);
+        const dt = new Date(Date.UTC(y, m - 1, d));
+        return dt.getUTCFullYear() === y && dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d;
+      }
+
+      function isoToStamp(iso) {
+        const [y, m, d] = iso.split('-').map(Number);
+        return Date.UTC(y, m - 1, d);
+      }
+
+      function stampToISO(stamp) {
+        const d = new Date(stamp);
+        return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`;
+      }
+
+      function addDays(iso, amount) {
+        return stampToISO(isoToStamp(iso) + amount * 86400000);
+      }
+
+      function inclusiveDays(startISO, endISO) {
+        return Math.round((isoToStamp(endISO) - isoToStamp(startISO)) / 86400000) + 1;
+      }
+
+      function compactDate(iso) {
+        return iso.replaceAll('-', '');
+      }
+
+      function stationNow() {
+        const parts = new Intl.DateTimeFormat('en-US', {
+          timeZone: STATION_TZ,
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+          hourCycle: 'h23'
+        }).formatToParts(new Date());
+        const p = Object.fromEntries(parts.map(x => [x.type, x.value]));
+        let hour = Number(p.hour);
+        if (hour === 24) hour = 0;
+        const iso = `${p.year}-${p.month}-${p.day}`;
+        const stamp = Date.UTC(Number(p.year), Number(p.month) - 1, Number(p.day), hour, Number(p.minute), Number(p.second));
+        return { iso, stamp };
+      }
+
+      function parseNOAATime(text) {
+        const m = String(text || '').match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?/);
+        if (!m) return NaN;
+        return Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +(m[6] || 0));
+      }
+
+      function formatDateLabel(stamp) {
+        return new Intl.DateTimeFormat('en-US', {
+          timeZone: 'UTC', weekday: 'short', month: 'short', day: 'numeric'
+        }).format(new Date(stamp));
+      }
+
+      function formatDateCompact(stamp) {
+        return new Intl.DateTimeFormat('en-US', {
+          timeZone: 'UTC', month: 'short', day: 'numeric'
+        }).format(new Date(stamp));
+      }
+
+      function formatWeekdayShort(stamp) {
+        return new Intl.DateTimeFormat('en-US', {
+          timeZone: 'UTC', weekday: 'short'
+        }).format(new Date(stamp));
+      }
+
+      function formatDateRangeLabel(stamp) {
+        return `${formatWeekdayShort(stamp)} ${formatDateCompact(stamp)}`;
+      }
+
+      function formatTime12(stamp) {
+        const d = new Date(stamp);
+        const hour24 = d.getUTCHours();
+        const hour12 = hour24 % 12 || 12;
+        const suffix = hour24 >= 12 ? 'pm' : 'am';
+        return `${String(hour12).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')}${suffix}`;
+      }
+
+      function formatLocalTime12(stamp) {
+        const d = new Date(stamp);
+        const hour24 = d.getHours();
+        const hour12 = hour24 % 12 || 12;
+        const suffix = hour24 >= 12 ? 'pm' : 'am';
+        return `${String(hour12).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}${suffix}`;
+      }
+
+      function escapeXML(value) {
+        return String(value)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&apos;');
+      }
+
+      /* ----------------------------
+         Remembered range preferences
+         Within a station-local calendar day, quick-range choices persist across
+         reloads and a custom range can be restored. On the first load of each new
+         station-local day, the range resets to the 3-day quick view.
+         ---------------------------- */
+      function readQuickRangePreference() {
+        try {
+          const days = Number(localStorage.getItem(QUICK_RANGE_KEY));
+          return [1, 3, 7].includes(days) ? days : 3;
+        } catch {
+          return 3;
+        }
+      }
+
+      function readRangeResetDay() {
+        try { return localStorage.getItem(RANGE_RESET_DAY_KEY) || ''; }
+        catch { return ''; }
+      }
+
+      function markRangeResetDay(today) {
+        try { localStorage.setItem(RANGE_RESET_DAY_KEY, today); }
+        catch { /* Storage can be unavailable in private/restricted contexts. */ }
+      }
+
+      function writeQuickRangePreference(days) {
+        if (![1, 3, 7].includes(Number(days))) return;
+        try { localStorage.setItem(QUICK_RANGE_KEY, String(Number(days))); }
+        catch { /* Storage can be unavailable in private/restricted contexts. */ }
+      }
+
+      function clearCustomRange() {
+        try { localStorage.removeItem(CUSTOM_RANGE_KEY); }
+        catch { /* Storage can be unavailable in private/restricted contexts. */ }
+      }
+
+      function saveCustomRange(startISO, endISO) {
+        try {
+          localStorage.setItem(CUSTOM_RANGE_KEY, JSON.stringify({
+            savedOn: stationNow().iso,
+            startISO,
+            endISO
+          }));
+        } catch {
+          /* Storage can be unavailable in private/restricted contexts. */
+        }
+      }
+
+      function readCurrentCustomRange(today) {
+        try {
+          const raw = localStorage.getItem(CUSTOM_RANGE_KEY);
+          if (!raw) return null;
+          const item = JSON.parse(raw);
+
+          // A custom selection intentionally expires at the next station-local day.
+          if (!item || item.savedOn !== today) {
+            localStorage.removeItem(CUSTOM_RANGE_KEY);
+            writeQuickRangePreference(3);
+            return null;
+          }
+
+          if (!validISODate(item.startISO) || !validISODate(item.endISO)) {
+            localStorage.removeItem(CUSTOM_RANGE_KEY);
+            return null;
+          }
+          if (isoToStamp(item.endISO) < isoToStamp(item.startISO) || inclusiveDays(item.startISO, item.endISO) > MAX_DAYS) {
+            localStorage.removeItem(CUSTOM_RANGE_KEY);
+            return null;
+          }
+          return { startISO: item.startISO, endISO: item.endISO };
+        } catch {
+          clearCustomRange();
+          return null;
+        }
+      }
+
+      /* ----------------------------
+         NOAA URL builders
+         ---------------------------- */
+      function apiParams(beginISO, endISO) {
+        return new URLSearchParams({
+          product: 'predictions',
+          application: APP_NAME,
+          begin_date: compactDate(beginISO),
+          end_date: compactDate(endISO),
+          datum: DATUM,
+          station: STATION_ID,
+          time_zone: 'lst_ldt',
+          units: 'english',
+          interval: 'hilo',
+          format: 'json'
+        });
+      }
+
+      function buildAPIURL(base, beginISO, endISO) {
+        return `${base}?${apiParams(beginISO, endISO).toString()}`;
+      }
+
+      function buildNOAAPageURL(beginISO, endISO) {
+        const q = new URLSearchParams({
+          id: STATION_ID,
+          units: 'standard',
+          bdate: compactDate(beginISO),
+          edate: compactDate(endISO),
+          timezone: 'LST/LDT',
+          clock: '12hour',
+          datum: DATUM,
+          interval: 'hilo',
+          action: 'dailychart'
+        });
+        return `${NOAA_PAGE_BASE}?${q.toString()}`;
+      }
+
+      function updateSourceLinks(startISO, endISO) {
+        el.officialLink.href = buildNOAAPageURL(startISO, endISO);
+        el.apiLink.href = buildAPIURL(NOAA_API_BASE, startISO, endISO);
+      }
+
+      /* ----------------------------
+         Cache and fetch
+         ---------------------------- */
+      function cacheKey(beginISO, endISO) {
+        return `hi-tides-v3:${STATION_ID}:${beginISO}:${endISO}`;
+      }
+
+      function readCache(beginISO, endISO) {
+        try {
+          const raw = localStorage.getItem(cacheKey(beginISO, endISO));
+          if (!raw) return null;
+          const item = JSON.parse(raw);
+          if (!item || !item.data || !item.savedAt) return null;
+          return { ...item, fresh: Date.now() - item.savedAt < CACHE_TTL_MS };
+        } catch {
+          return null;
+        }
+      }
+
+      function writeCache(beginISO, endISO, data) {
+        try {
+          localStorage.setItem(cacheKey(beginISO, endISO), JSON.stringify({
+            savedAt: Date.now(),
+            data
+          }));
+        } catch {
+          /* Storage can be unavailable in private/restricted contexts. */
+        }
+      }
+
+      async function fetchJSONWithTimeout(url, controller, timeoutMs = 12000) {
+        const timeout = setTimeout(() => controller.abort('timeout'), timeoutMs);
+        try {
+          const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-store',
+            credentials: 'omit',
+            signal: controller.signal,
+            headers: { 'Accept': 'application/json,text/plain,*/*' }
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          const text = await response.text();
+          try { return JSON.parse(text); }
+          catch { throw new Error('The server did not return valid JSON.'); }
+        } finally {
+          clearTimeout(timeout);
+        }
+      }
+
+      function validateNOAAJSON(data) {
+        if (data?.error?.message) throw new Error(data.error.message);
+        if (!Array.isArray(data?.predictions)) throw new Error('NOAA returned no predictions array.');
+        if (!data.predictions.length) throw new Error('NOAA returned no tide predictions for this range.');
+        return data;
+      }
+
+      async function retrieveNOAA(beginISO, endISO, { force = false } = {}) {
+        const cached = readCache(beginISO, endISO);
+        if (!force && cached?.fresh) {
+          return { data: validateNOAAJSON(cached.data), source: 'cached', savedAt: cached.savedAt };
+        }
+
+        const directPrimary = buildAPIURL(NOAA_API_BASE, beginISO, endISO);
+        const directTAC = buildAPIURL(NOAA_TAC_API_BASE, beginISO, endISO);
+        const attempts = [
+          { source: 'direct', url: directPrimary },
+          { source: 'direct', url: directTAC },
+          { source: 'proxy', url: ALLORIGINS_RAW + encodeURIComponent(directPrimary) },
+          { source: 'proxy', url: CORSPROXY_IO + encodeURIComponent(directPrimary) }
+        ];
+
+        let lastError = null;
+        for (const attempt of attempts) {
+          const controller = new AbortController();
+          state.abortController = controller;
+          try {
+            const data = validateNOAAJSON(await fetchJSONWithTimeout(attempt.url, controller));
+            writeCache(beginISO, endISO, data);
+            return { data, source: attempt.source, savedAt: Date.now() };
+          } catch (error) {
+            if (error?.name === 'AbortError' && state.abortController !== controller) throw error;
+            lastError = error;
+          }
+        }
+
+        if (cached?.data) {
+          return { data: validateNOAAJSON(cached.data), source: 'stale-cache', savedAt: cached.savedAt };
+        }
+
+        throw lastError || new Error('Unable to reach NOAA.');
+      }
+
+      /* ----------------------------
+         Data normalization
+         ---------------------------- */
+      function normalizePredictions(data) {
+        const raw = data.predictions
+          .map((item) => ({
+            stamp: parseNOAATime(item.t),
+            textTime: String(item.t || ''),
+            value: Number(item.v),
+            type: String(item.type || item.ty || '').toUpperCase()
+          }))
+          .filter(p => Number.isFinite(p.stamp) && Number.isFinite(p.value))
+          .sort((a, b) => a.stamp - b.stamp);
+
+        // interval=hilo normally includes H/L. Infer only as a defensive fallback.
+        raw.forEach((p, i) => {
+          if (p.type === 'H' || p.type === 'L') return;
+          const prev = raw[i - 1];
+          const next = raw[i + 1];
+          if (prev && next) p.type = p.value >= prev.value && p.value >= next.value ? 'H' : 'L';
+          else if (next) p.type = p.value > next.value ? 'H' : 'L';
+          else if (prev) p.type = p.value > prev.value ? 'H' : 'L';
+          else p.type = '';
+        });
+
+        return raw;
+      }
+
+      function visibleForRange(points, startISO, endISO) {
+        const start = isoToStamp(startISO);
+        const endExclusive = isoToStamp(addDays(endISO, 1));
+        return points.filter(p => p.stamp >= start && p.stamp < endExclusive);
+      }
+
+      /* ----------------------------
+         Rendering: status, table, summary
+         ---------------------------- */
+      function setStatus(source, savedAt) {
+        const labels = {
+          direct: ['NOAA live', ''],
+          proxy: ['NOAA via CORS fallback', 'proxy'],
+          cached: ['Cached NOAA data', 'cached'],
+          'stale-cache': ['Offline · older cached NOAA data', 'cached']
+        };
+        const [label, cls] = labels[source] || ['NOAA data', ''];
+        const when = savedAt ? ` · ${formatLocalTime12(savedAt)}` : '';
+        el.status.innerHTML = `<span class="status-pill ${cls}">${escapeXML(label)}</span><span>${escapeXML(STATION_NAME)}${escapeXML(when)}</span>`;
+      }
+
+      function showNotice(title, message, includeLink = false) {
+        el.notice.innerHTML = '';
+        const strong = document.createElement('strong');
+        strong.textContent = title;
+        const text = document.createElement('span');
+        text.textContent = message;
+        el.notice.append(strong, text);
+        if (includeLink && state.startISO && state.endISO) {
+          const a = document.createElement('a');
+          a.href = buildNOAAPageURL(state.startISO, state.endISO);
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.textContent = ' Open the same range on NOAA ↗';
+          a.style.marginLeft = '.35em';
+          el.notice.append(a);
+        }
+        el.notice.classList.add('show');
+      }
+
+      function clearNotice() {
+        el.notice.classList.remove('show');
+        el.notice.textContent = '';
+      }
+
+      function renderTable(points) {
+        const filteredPoints = state.tableFilter === 'high'
+          ? points.filter(p => p.type === 'H')
+          : state.tableFilter === 'low'
+            ? points.filter(p => p.type === 'L')
+            : points;
+
+        if (!filteredPoints.length) {
+          const emptyLabel = state.tableFilter === 'high' ? 'No high tides in this range.' : state.tableFilter === 'low' ? 'No low tides in this range.' : 'No tides in this range.';
+          el.rows.innerHTML = `<tr><td colspan="4" style="color:var(--muted);">${emptyLabel}</td></tr>`;
+          return;
+        }
+
+        el.rows.innerHTML = filteredPoints.map(p => {
+          const isHigh = p.type === 'H';
+          const tideName = isHigh ? 'High' : 'Low';
+          const dayISO = stampToISO(Date.UTC(new Date(p.stamp).getUTCFullYear(), new Date(p.stamp).getUTCMonth(), new Date(p.stamp).getUTCDate()));
+          const [y, m, d] = dayISO.split('-');
+          return `
+            <tr>
+              <td class="date-cell"><strong>${m}/${d}/${y}</strong><span>${escapeXML(formatDateLabel(p.stamp).split(',')[0])}</span></td>
+              <td class="number">${formatTime12(p.stamp)}</td>
+              <td class="number"><strong>${p.value.toFixed(2)}</strong> ft</td>
+              <td><span class="tide-badge ${isHigh ? 'high' : 'low'}"><i class="tide-arrow" aria-hidden="true"></i>${tideName}</span></td>
+            </tr>`;
+        }).join('');
+      }
+
+      function renderSummary(points) {
+        if (!points.length) {
+          el.highest.textContent = '—';
+          el.highestMeta.textContent = '—';
+          el.lowest.textContent = '—';
+          el.lowestMeta.textContent = '—';
+          el.count.textContent = '0';
+          return;
+        }
+        const highest = points.reduce((a, b) => b.value > a.value ? b : a);
+        const lowest = points.reduce((a, b) => b.value < a.value ? b : a);
+        el.highest.textContent = `${highest.value.toFixed(2)} ft`;
+        el.highestMeta.innerHTML = `<span>${escapeXML(formatDateRangeLabel(highest.stamp))}</span><span>${escapeXML(formatTime12(highest.stamp))}</span>`;
+        el.lowest.textContent = `${lowest.value.toFixed(2)} ft`;
+        el.lowestMeta.innerHTML = `<span>${escapeXML(formatDateRangeLabel(lowest.stamp))}</span><span>${escapeXML(formatTime12(lowest.stamp))}</span>`;
+        el.count.textContent = String(points.length);
+      }
+
+      /* ----------------------------
+         Rendering: SVG chart
+         The half-cosine interpolation lands exactly on each official NOAA extremum,
+         has a horizontal tangent there, and cannot overshoot between adjacent H/L values.
+         It is intentionally labeled as visualization only.
+         ---------------------------- */
+      function niceStep(raw) {
+        const candidates = [0.1, 0.2, 0.25, 0.5, 1, 2, 5, 10];
+        return candidates.find(v => v >= raw) || 10;
+      }
+
+      function buildCurve(points, startStamp, endStamp) {
+        const samples = [];
+        for (let i = 0; i < points.length - 1; i++) {
+          const a = points[i];
+          const b = points[i + 1];
+          if (b.stamp < startStamp || a.stamp > endStamp) continue;
+          const span = b.stamp - a.stamp;
+          if (span <= 0) continue;
+          const u0 = Math.max(0, (startStamp - a.stamp) / span);
+          const u1 = Math.min(1, (endStamp - a.stamp) / span);
+          if (u1 < u0) continue;
+          const subdivisions = Math.max(10, Math.ceil((u1 - u0) * 28));
+          for (let j = 0; j <= subdivisions; j++) {
+            if (i > 0 && j === 0) continue;
+            const u = u0 + (u1 - u0) * (j / subdivisions);
+            const eased = (1 - Math.cos(Math.PI * u)) / 2;
+            samples.push({
+              stamp: a.stamp + span * u,
+              value: a.value + (b.value - a.value) * eased
+            });
+          }
+        }
+        return samples;
+      }
+
+      function interpolatedTideValue(points, stamp) {
+        for (let i = 0; i < points.length - 1; i++) {
+          const a = points[i];
+          const b = points[i + 1];
+          if (stamp < a.stamp || stamp > b.stamp) continue;
+          const span = b.stamp - a.stamp;
+          if (span <= 0) return null;
+          const u = (stamp - a.stamp) / span;
+          const eased = (1 - Math.cos(Math.PI * u)) / 2;
+          return a.value + (b.value - a.value) * eased;
+        }
+        return null;
+      }
+
+      function renderChart(allPoints, visiblePoints, startISO, endISO) {
+        const rangeStart = isoToStamp(startISO);
+        const rangeEnd = isoToStamp(addDays(endISO, 1));
+        const curve = buildCurve(allPoints, rangeStart, rangeEnd);
+
+        if (curve.length < 2 || !visiblePoints.length) {
+          el.chartWrap.innerHTML = '<div class="chart-empty">Not enough tide points to draw this range.</div>';
+          return;
+        }
+
+        const measuredWidth = Math.max(340, Math.round(el.chartWrap.clientWidth || 380));
+        const W = Math.min(940, measuredWidth);
+        // Reserve a slim band above the plotting rectangle for the current-tide capsule.
+        // H grows by the same amount as the top margin so the actual plot height is unchanged.
+        const H = W < 560 ? 385 : 445;
+        const M = W < 560
+          ? { l: 44, r: 12, t: 89, b: 56 }
+          : { l: 52, r: 24, t: 89, b: 60 };
+        const iw = W - M.l - M.r;
+        const ih = H - M.t - M.b;
+
+        // Build the vertical scale from the actual visible NOAA extrema.
+        // Upper bound: round the highest high UP to a whole foot, then add 1 ft.
+        // Lower bound: round the lowest low DOWN to a whole foot, then subtract 1 ft.
+        // Math.ceil/floor preserve exact integers before that 1 ft margin is added.
+        const highValues = visiblePoints.filter(p => p.type === 'H').map(p => p.value);
+        const lowValues = visiblePoints.filter(p => p.type === 'L').map(p => p.value);
+        const visibleValues = visiblePoints.map(p => p.value);
+        const highestHigh = highValues.length ? Math.max(...highValues) : Math.max(...visibleValues);
+        const lowestLow = lowValues.length ? Math.min(...lowValues) : Math.min(...visibleValues);
+        const yStep = 1;
+        let yMax = Math.ceil(highestHigh) + 1;
+        let yMin = Math.floor(lowestLow) - 1;
+        if (yMax <= yMin) yMax = yMin + 2;
+
+        const x = stamp => M.l + ((stamp - rangeStart) / (rangeEnd - rangeStart)) * iw;
+        const y = value => M.t + (1 - (value - yMin) / (yMax - yMin)) * ih;
+
+        const linePath = curve.map((p, i) => `${i ? 'L' : 'M'} ${x(p.stamp).toFixed(2)} ${y(p.value).toFixed(2)}`).join(' ');
+        const areaPath = `${linePath} L ${x(curve[curve.length - 1].stamp).toFixed(2)} ${(M.t + ih).toFixed(2)} L ${x(curve[0].stamp).toFixed(2)} ${(M.t + ih).toFixed(2)} Z`;
+
+        let yGrid = '';
+        for (let v = Math.ceil(yMin / yStep) * yStep; v <= yMax + yStep * .001; v += yStep) {
+          const yy = y(v);
+          yGrid += `<line x1="${M.l}" y1="${yy}" x2="${W - M.r}" y2="${yy}" class="grid"/>`;
+          yGrid += `<text x="${M.l - 12}" y="${yy + 4}" text-anchor="end" class="axis-label">${Number(v.toFixed(2))} ft</text>`;
+        }
+
+        const days = inclusiveDays(startISO, endISO);
+        const dayLabelEvery = Math.max(1, Math.ceil(days / 7));
+        let xGrid = '';
+        for (let d = 0; d <= days; d++) {
+          const stamp = rangeStart + d * 86400000;
+          const xx = x(stamp);
+          xGrid += `<line x1="${xx}" y1="${M.t}" x2="${xx}" y2="${M.t + ih}" class="day-grid"/>`;
+          if (d < days && d % dayLabelEvery === 0) {
+            const center = x(stamp + Math.min(dayLabelEvery, days - d) * 86400000 / 2);
+            xGrid += `<text x="${center}" y="${H - 30}" text-anchor="middle" class="axis-label day-label day-date">${escapeXML(formatDateCompact(stamp))}</text>`;
+            xGrid += `<text x="${center}" y="${H - 14}" text-anchor="middle" class="axis-label day-label day-weekday">${escapeXML(formatWeekdayShort(stamp))}</text>`;
+          }
+        }
+
+        let markers = '';
+        visiblePoints.forEach((p) => {
+          const px = x(p.stamp), py = y(p.value);
+          const isHigh = p.type === 'H';
+          const valueOffset = isHigh ? -14 : 20;
+          const timeOffset = isHigh ? -25 : 31;
+          markers += `<circle cx="${px}" cy="${py}" r="6.5" class="point point-${isHigh ? 'high' : 'low'}"/>`;
+          markers += `<text x="${px}" y="${py + valueOffset}" text-anchor="middle" class="value-label">${p.value.toFixed(2)} ft</text>`;
+          markers += `<text x="${px}" y="${py + timeOffset}" text-anchor="middle" class="time-label">${formatTime12(p.stamp)}</text>`;
+        });
+
+        const chipW = 72;
+        const chipH = 42;
+        const chipY = 23;
+        // Small state-colored chevrons sit just outside the capsule as a subtle
+        // horizontal-drag affordance. Reserve their full width when edge-clamping.
+        const handleExtent = chipW / 2 + 18;
+        const now = stationNow().stamp;
+        const nowInRange = now >= rangeStart && now < rangeEnd;
+
+        // Preserve a scrubbed position across chart redraws (resize/minute refresh/data
+        // refresh), but never carry it into a different visible date range.
+        if (state.probeStamp !== null && (state.probeStamp < rangeStart || state.probeStamp >= rangeEnd)) {
+          state.probeStamp = null;
+        }
+
+        let nowLineMarkup = '';
+        if (nowInRange) {
+          const nx = x(now);
+          nowLineMarkup = `<line id="nowLine" x1="${nx}" y1="${M.t}" x2="${nx}" y2="${M.t + ih}" class="now-line"/>`;
+        }
+
+        let probeMarkup = '';
+        const probeSelected = state.probeStamp !== null;
+        const displayStamp = probeSelected ? state.probeStamp : now;
+        if ((probeSelected || nowInRange) && displayStamp >= rangeStart && displayStamp < rangeEnd) {
+          const displayValue = interpolatedTideValue(allPoints, displayStamp);
+          if (Number.isFinite(displayValue)) {
+            const displayX = x(displayStamp);
+            // Keep the capsule fully inside the SVG/card near the range edges. The
+            // guide line itself always remains at the exact selected timestamp.
+            const chipCenter = Math.min(W - handleExtent, Math.max(handleExtent, displayX));
+            probeMarkup = `
+              <line id="probeLine" x1="${displayX}" y1="${M.t}" x2="${displayX}" y2="${M.t + ih}" class="probe-line${probeSelected ? '' : ' is-hidden'}"/>
+              <g id="probeHandle" class="probe-handle${probeSelected ? ' is-selected' : ''}" transform="translate(${chipCenter} 0)">
+                <text id="probeDate" x="0" y="14" text-anchor="middle" class="now-date-label">${escapeXML(formatDateRangeLabel(displayStamp))}</text>
+                <rect x="${-chipW / 2}" y="${chipY}" width="${chipW}" height="${chipH}" rx="21" class="now-chip"/>
+                <path d="M ${-chipW / 2 - 7} ${chipY + chipH / 2 - 5} L ${-chipW / 2 - 12} ${chipY + chipH / 2} L ${-chipW / 2 - 7} ${chipY + chipH / 2 + 5}" class="drag-chevron"/>
+                <path d="M ${chipW / 2 + 7} ${chipY + chipH / 2 - 5} L ${chipW / 2 + 12} ${chipY + chipH / 2} L ${chipW / 2 + 7} ${chipY + chipH / 2 + 5}" class="drag-chevron"/>
+                <text id="probeTime" x="0" y="${chipY + 15}" text-anchor="middle" dominant-baseline="middle" class="now-label">${formatTime12(displayStamp)}</text>
+                <text id="probeHeight" x="0" y="${chipY + 29}" text-anchor="middle" dominant-baseline="middle" class="now-label">${displayValue.toFixed(2)} ft</text>
+                <text id="probeResetHint" x="0" y="80" text-anchor="middle" class="reset-hint${probeSelected ? '' : ' is-hidden'}">Tap to reset</text>
+                <rect x="${-handleExtent}" y="${chipY - 8}" width="${handleExtent * 2}" height="${chipH + 16}" rx="29" class="probe-hit"/>
+              </g>`;
+          }
+        }
+
+        el.chartWrap.innerHTML = `
+          <svg id="chart" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="chartSvgTitle chartSvgDesc">
+            <title id="chartSvgTitle">Tide predictions for ${escapeXML(STATION_NAME)}</title>
+            <desc id="chartSvgDesc">A smooth visualization through ${visiblePoints.length} official NOAA high and low tide predictions from ${escapeXML(startISO)} through ${escapeXML(endISO)}.</desc>
+            <defs>
+              <linearGradient id="tideFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" class="fill-top"/>
+                <stop offset="1" class="fill-bottom"/>
+              </linearGradient>
+              <filter id="pointShadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity=".18"/>
+              </filter>
+            </defs>
+            <style>
+              .grid{stroke:var(--hairline);stroke-width:1;vector-effect:non-scaling-stroke}.day-grid{stroke:var(--hairline-strong);stroke-width:2.4;stroke-opacity:.88;stroke-dasharray:3 5;vector-effect:non-scaling-stroke}.axis-label{fill:var(--muted);font:600 13px -apple-system,BlinkMacSystemFont,system-ui,sans-serif}.day-label{font-size:13px}.day-date{font-weight:600}.day-weekday{font-weight:540}.tide-area{fill:url(#tideFill)}.fill-top{stop-color:var(--accent);stop-opacity:.23}.fill-bottom{stop-color:var(--accent);stop-opacity:.025}.tide-line{fill:none;stroke:var(--accent);stroke-width:4.2;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}.point{stroke:var(--surface-solid);stroke-width:3;fill:var(--accent);filter:url(#pointShadow);vector-effect:non-scaling-stroke}.point-low{fill:var(--accent-2)}.value-label{fill:var(--ink);font:760 10px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;paint-order:stroke;stroke:var(--surface-solid);stroke-width:3px;stroke-linejoin:round}.time-label{fill:var(--muted);font:700 8.05px -apple-system,BlinkMacSystemFont,system-ui,sans-serif;paint-order:stroke;stroke:var(--surface-solid);stroke-width:2.4px;stroke-linejoin:round}.now-line{stroke:var(--green);stroke-width:2;stroke-dasharray:5 5;vector-effect:non-scaling-stroke}.probe-line{stroke:var(--accent);stroke-width:2;stroke-dasharray:5 5;vector-effect:non-scaling-stroke}.probe-line.is-hidden{display:none}.now-date-label{fill:var(--muted);font:650 11px -apple-system,BlinkMacSystemFont,system-ui,sans-serif}.now-chip{fill:var(--green)}.probe-handle.is-selected .now-chip{fill:var(--accent)}.drag-chevron{fill:none;stroke:var(--green);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:.82;vector-effect:non-scaling-stroke}.probe-handle.is-selected .drag-chevron{stroke:var(--accent)}.now-label{fill:white;font:760 10px -apple-system,BlinkMacSystemFont,system-ui,sans-serif}.reset-hint{fill:var(--muted);font:540 8.5px -apple-system,BlinkMacSystemFont,system-ui,sans-serif}.reset-hint.is-hidden{display:none}.probe-handle{cursor:grab;touch-action:none;-webkit-touch-callout:none}.probe-handle.is-dragging{cursor:grabbing}.probe-hit{fill:transparent;stroke:none;pointer-events:all;touch-action:none;-webkit-touch-callout:none}
+            </style>
+            ${yGrid}
+            ${xGrid}
+            <path d="${areaPath}" class="tide-area"/>
+            <path d="${linePath}" class="tide-line"/>
+            ${nowLineMarkup}
+            ${probeMarkup}
+            ${markers}
+          </svg>`;
+
+        installProbeDrag({
+          allPoints, rangeStart, rangeEnd, W, M, iw, ih, x,
+          chipW, chipY, chipH, handleExtent
+        });
+      }
+
+      function installProbeDrag({ allPoints, rangeStart, rangeEnd, W, M, iw, ih, x, chipW, chipY, chipH, handleExtent }) {
+        const svg = document.getElementById('chart');
+        const handle = svg?.querySelector('#probeHandle');
+        const nowLine = svg?.querySelector('#nowLine');
+        const probeLine = svg?.querySelector('#probeLine');
+        const dateLabel = svg?.querySelector('#probeDate');
+        const timeLabel = svg?.querySelector('#probeTime');
+        const heightLabel = svg?.querySelector('#probeHeight');
+        const resetHint = svg?.querySelector('#probeResetHint');
+        if (!svg || !handle || !probeLine || !dateLabel || !timeLabel || !heightLabel || !resetHint) return;
+
+        // A tiny release threshold prevents accidental color flicker. Once detached,
+        // the wider snap target activates only while the finger/mouse is moving back
+        // toward the live line, so nearby times remain easy to inspect.
+        const RELEASE_PX = 1.5;
+        const SNAP_PX = 5;
+        const SNAP_APPROACH_PX = .35;
+        const TAP_SLOP_PX = 3;
+        const RELEASE_RESET_MS = 17 * 60 * 1000;
+        const minStamp = rangeStart;
+        const maxStamp = rangeEnd - 60000; // last displayed minute, never next day's midnight
+
+        const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+        const stampFromX = svgX => {
+          const clampedX = clamp(svgX, M.l, W - M.r);
+          const raw = rangeStart + ((clampedX - M.l) / iw) * (rangeEnd - rangeStart);
+          return clamp(Math.round(raw / 60000) * 60000, minStamp, maxStamp);
+        };
+
+        function clientToSvgX(clientX) {
+          const rect = svg.getBoundingClientRect();
+          if (!rect.width) return M.l;
+          return (clientX - rect.left) * (W / rect.width);
+        }
+
+        function updateProbeVisual(stamp, selected, showResetHint = selected) {
+          const value = interpolatedTideValue(allPoints, stamp);
+          if (!Number.isFinite(value)) return;
+          const guideX = x(stamp);
+          const chipCenter = clamp(guideX, handleExtent, W - handleExtent);
+
+          handle.setAttribute('transform', `translate(${chipCenter} 0)`);
+          handle.classList.toggle('is-selected', selected);
+          dateLabel.textContent = formatDateRangeLabel(stamp);
+          timeLabel.textContent = formatTime12(stamp);
+          heightLabel.textContent = `${value.toFixed(2)} ft`;
+          resetHint.classList.toggle('is-hidden', !showResetHint);
+          probeLine.setAttribute('x1', guideX);
+          probeLine.setAttribute('x2', guideX);
+          probeLine.classList.toggle('is-hidden', !selected);
+          if (!selected && nowLine) {
+            nowLine.setAttribute('x1', guideX);
+            nowLine.setAttribute('x2', guideX);
+          }
+        }
+
+        let activePointerId = null;
+        let dragOffsetX = 0;
+        let pressClientX = 0;
+        let dragStarted = false;
+        let attached = state.probeStamp === null;
+        let snapNowStamp = stationNow().stamp;
+        let lastDistanceToNow = Infinity;
+
+        function onPointerDown(event) {
+          if (activePointerId !== null) return;
+          if (event.pointerType === 'mouse' && event.button !== 0) return;
+          event.preventDefault();
+
+          activePointerId = event.pointerId;
+          state.probeDragging = true;
+          handle.classList.add('is-dragging');
+          snapNowStamp = stationNow().stamp;
+          attached = state.probeStamp === null;
+          pressClientX = event.clientX;
+          dragStarted = false;
+
+          const anchorStamp = state.probeStamp ?? snapNowStamp;
+          dragOffsetX = x(anchorStamp) - clientToSvgX(event.clientX);
+          lastDistanceToNow = snapNowStamp >= rangeStart && snapNowStamp < rangeEnd
+            ? Math.abs(x(anchorStamp) - x(snapNowStamp))
+            : Infinity;
+
+          try { svg.setPointerCapture(activePointerId); } catch { /* Pointer capture is a progressive enhancement. */ }
+        }
+
+        function onPointerMove(event) {
+          if (event.pointerId !== activePointerId) return;
+          event.preventDefault();
+
+          // Treat a press with only tiny finger/mouse jitter as a tap. Once this
+          // threshold is crossed, the interaction becomes a drag for the rest of
+          // that press and the reset hint stays visible until pointer release.
+          if (!dragStarted) {
+            if (Math.abs(event.clientX - pressClientX) <= TAP_SLOP_PX) return;
+            dragStarted = true;
+            resetHint.classList.remove('is-hidden');
+          }
+
+          const targetX = clamp(clientToSvgX(event.clientX) + dragOffsetX, M.l, W - M.r);
+          const canSnapToNow = snapNowStamp >= rangeStart && snapNowStamp < rangeEnd;
+          const nowX = canSnapToNow ? x(snapNowStamp) : NaN;
+          const distanceToNow = canSnapToNow ? Math.abs(targetX - nowX) : Infinity;
+
+          if (canSnapToNow) {
+            if (attached) {
+              if (distanceToNow <= RELEASE_PX) {
+                state.probeStamp = null;
+                lastDistanceToNow = distanceToNow;
+                updateProbeVisual(snapNowStamp, false, true);
+                return;
+              }
+              attached = false;
+            } else if (distanceToNow <= SNAP_PX && distanceToNow + SNAP_APPROACH_PX < lastDistanceToNow) {
+              attached = true;
+              state.probeStamp = null;
+              lastDistanceToNow = distanceToNow;
+              updateProbeVisual(snapNowStamp, false, true);
+              return;
+            }
+          }
+
+          const stamp = stampFromX(targetX);
+          state.probeStamp = stamp;
+          lastDistanceToNow = distanceToNow;
+          updateProbeVisual(stamp, true, true);
+        }
+
+        function endDrag(event) {
+          if (event.pointerId !== activePointerId) return;
+          const wasPointerUp = event.type === 'pointerup';
+          if (wasPointerUp) event.preventDefault();
+          const pointerToRelease = activePointerId;
+          activePointerId = null;
+          try { svg.releasePointerCapture(pointerToRelease); } catch { /* It may already have been released. */ }
+          state.probeDragging = false;
+          handle.classList.remove('is-dragging');
+
+          const liveNow = stationNow().stamp;
+          const liveNowInRange = liveNow >= rangeStart && liveNow < rangeEnd;
+
+          // A true tap/click on the capsule is a reset button. Small pointer jitter
+          // never starts a drag, so this remains reliable with a fingertip on iOS.
+          if (wasPointerUp && !dragStarted) {
+            state.probeStamp = null;
+            attached = true;
+            updateProbeVisual(liveNow, false, false);
+            return;
+          }
+
+          // Final release safety-net: if a still-blue selection is strictly less
+          // than 17 minutes from the live station time, snap it home on release.
+          // This is intentionally time-based rather than pixel-based, so its meaning
+          // is consistent whether the chart is showing one day or several weeks.
+          if (wasPointerUp && state.probeStamp !== null && liveNowInRange
+              && Math.abs(state.probeStamp - liveNow) < RELEASE_RESET_MS) {
+            state.probeStamp = null;
+            attached = true;
+            updateProbeVisual(liveNow, false, false);
+            return;
+          }
+
+          // If the drag magnetically reattached to live time, update to the exact
+          // current second and hide the hint only now that the press has ended.
+          if (state.probeStamp === null) {
+            updateProbeVisual(liveNow, false, false);
+            return;
+          }
+
+          // A released off-live selection stays blue and keeps the reset hint.
+          updateProbeVisual(state.probeStamp, true, true);
+        }
+
+        handle.addEventListener('pointerdown', onPointerDown, { passive: false });
+        handle.addEventListener('contextmenu', event => event.preventDefault());
+        svg.addEventListener('pointermove', onPointerMove, { passive: false });
+        svg.addEventListener('pointerup', endDrag, { passive: false });
+        svg.addEventListener('pointercancel', endDrag, { passive: false });
+        svg.addEventListener('lostpointercapture', event => {
+          if (event.pointerId === activePointerId) endDrag(event);
+        });
+      }
+
+      /* ----------------------------
+         Input validation and orchestration
+         ---------------------------- */
+      function selectedQuickRange() {
+        const today = stationNow().iso;
+        if (el.start.value !== today) return 0;
+        const days = inclusiveDays(el.start.value, el.end.value);
+        return [1, 3, 7].includes(days) ? days : 0;
+      }
+
+      function updateQuickButtons() {
+        const active = selectedQuickRange();
+        el.quickButtons.forEach(btn => btn.setAttribute('aria-pressed', String(Number(btn.dataset.days) === active)));
+      }
+
+      function validateRange() {
+        const startISO = el.start.value;
+        const endISO = el.end.value;
+        if (!validISODate(startISO) || !validISODate(endISO)) throw new Error('Choose both a valid start and end date.');
+        if (isoToStamp(endISO) < isoToStamp(startISO)) throw new Error('The end date must be on or after the start date.');
+        const days = inclusiveDays(startISO, endISO);
+        if (days > MAX_DAYS) throw new Error(`Choose ${MAX_DAYS} days or fewer. NOAA's tide-prediction page uses a 31-day maximum range.`);
+        return { startISO, endISO, days };
+      }
+
+      function setLoading(loading) {
+        el.load.disabled = loading;
+        el.refresh.disabled = loading;
+        el.load.textContent = loading ? 'Loading…' : 'Show tides';
+        document.querySelectorAll('.card').forEach(card => card.classList.toggle('loading', loading));
+      }
+
+      async function loadRange({ force = false, persistSelection = false } = {}) {
+        clearNotice();
+        let range;
+        try {
+          range = validateRange();
+        } catch (error) {
+          showNotice('Check the date range', error.message);
+          return;
+        }
+
+        const { startISO, endISO, days } = range;
+        if (persistSelection) persistCurrentSelection();
+        const rangeChanged = Boolean(state.startISO) && (state.startISO !== startISO || state.endISO !== endISO);
+        if (rangeChanged) {
+          state.probeStamp = null;
+          state.probeDragging = false;
+        }
+        state.startISO = startISO;
+        state.endISO = endISO;
+        updateQuickButtons();
+        updateSourceLinks(startISO, endISO);
+        el.rangeLabel.textContent = days === 1
+          ? formatDateRangeLabel(isoToStamp(startISO))
+          : `${formatDateRangeLabel(isoToStamp(startISO))} - ${formatDateRangeLabel(isoToStamp(endISO))}`;
+
+        // Match NOAA's own graph strategy: fetch one day before/after so the
+        // visual curve continues naturally through the selected boundaries.
+        const paddedStart = addDays(startISO, -1);
+        const paddedEnd = addDays(endISO, 1);
+
+        if (state.abortController) state.abortController.abort('superseded');
+        setLoading(true);
+        el.status.innerHTML = '<span class="status-pill cached">Loading NOAA…</span>';
+
+        try {
+          const result = await retrieveNOAA(paddedStart, paddedEnd, { force });
+          const allPoints = normalizePredictions(result.data);
+          const visiblePoints = visibleForRange(allPoints, startISO, endISO);
+          if (!visiblePoints.length) throw new Error('NOAA returned data, but there are no high/low tides inside the selected dates.');
+
+          state.allPoints = allPoints;
+          state.visiblePoints = visiblePoints;
+          state.source = result.source;
+
+          setStatus(result.source, result.savedAt);
+          renderTable(visiblePoints);
+          renderSummary(visiblePoints);
+          renderChart(allPoints, visiblePoints, startISO, endISO);
+
+          if (state.nowTimer) clearInterval(state.nowTimer);
+          state.nowTimer = setInterval(() => {
+            if (state.allPoints.length && !state.probeDragging) {
+              renderChart(state.allPoints, state.visiblePoints, state.startISO, state.endISO);
+            }
+          }, 60000);
+        } catch (error) {
+          if (String(error?.name) === 'AbortError' || String(error?.message || '').includes('superseded')) return;
+          state.allPoints = [];
+          state.visiblePoints = [];
+          el.status.textContent = 'NOAA data unavailable';
+          el.chartWrap.innerHTML = '<div class="chart-empty">Could not load tide predictions.</div>';
+          el.rows.innerHTML = '<tr><td colspan="4" style="color:var(--muted);">No data loaded.</td></tr>';
+          renderSummary([]);
+          showNotice(
+            'Could not load NOAA data',
+            `${error?.message || 'The request failed.'} This static GitHub Pages site tries NOAA directly first, then a public CORS fallback, then any previously cached NOAA response.`,
+            true
+          );
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      function persistCurrentSelection() {
+        const quickDays = selectedQuickRange();
+        if (quickDays) {
+          writeQuickRangePreference(quickDays);
+          clearCustomRange();
+        } else {
+          saveCustomRange(el.start.value, el.end.value);
+        }
+      }
+
+      function initializeDates() {
+        const today = stationNow().iso;
+        state.stationDay = today;
+
+        // The first load on each station-local calendar day always starts from
+        // the 3-day quick view. Later reloads that same day can restore whatever
+        // quick/custom range the user selected during that day.
+        const firstLoadToday = readRangeResetDay() !== today;
+        if (firstLoadToday) {
+          clearCustomRange();
+          writeQuickRangePreference(3);
+          markRangeResetDay(today);
+        }
+
+        const custom = firstLoadToday ? null : readCurrentCustomRange(today);
+        if (custom) {
+          el.start.value = custom.startISO;
+          el.end.value = custom.endISO;
+        } else {
+          const days = readQuickRangePreference();
+          el.start.value = today;
+          el.end.value = addDays(today, days - 1);
+        }
+        updateQuickButtons();
+      }
+
+      function handleStationDayRollover() {
+        const today = stationNow().iso;
+        if (!state.stationDay) {
+          state.stationDay = today;
+          return;
+        }
+        if (today === state.stationDay) return;
+
+        state.stationDay = today;
+        // Midnight is the same daily-reset boundary as a fresh first load: discard
+        // any prior-day custom range and return to the 3-day quick view.
+        clearCustomRange();
+        writeQuickRangePreference(3);
+        markRangeResetDay(today);
+        el.start.value = today;
+        el.end.value = addDays(today, 2);
+        updateQuickButtons();
+        loadRange();
+      }
+
+      el.quickButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const days = Number(btn.dataset.days);
+          const today = stationNow().iso;
+          el.start.value = today;
+          el.end.value = addDays(today, days - 1);
+          updateQuickButtons();
+          loadRange({ persistSelection: true });
+        });
+      });
+
+      el.tideFilterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.tableFilter = btn.dataset.tideFilter;
+          el.tideFilterButtons.forEach(option => option.setAttribute('aria-pressed', String(option === btn)));
+          renderTable(state.visiblePoints);
+        });
+      });
+
+      el.start.addEventListener('change', updateQuickButtons);
+      el.end.addEventListener('change', updateQuickButtons);
+      el.load.addEventListener('click', () => loadRange({ persistSelection: true }));
+      el.refresh.addEventListener('click', () => loadRange({ force: true }));
+      window.addEventListener('resize', () => {
+        clearTimeout(state.resizeTimer);
+        state.resizeTimer = setTimeout(() => {
+          if (state.allPoints.length && !state.probeDragging) {
+            renderChart(state.allPoints, state.visiblePoints, state.startISO, state.endISO);
+          }
+        }, 120);
+      }, { passive: true });
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) handleStationDayRollover();
+      });
+
+      initializeDates();
+      loadRange();
+      state.rolloverTimer = setInterval(handleStationDayRollover, 60000);
+    })();
+  </script>
+</body>
+</html>
