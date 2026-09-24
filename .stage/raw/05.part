@@ -1,0 +1,142 @@
+d');
+data = normalized;
+lastSuccessfulRefresh = Date.now();
+authBlocked = false;
+writeCache(data);
+render();
+setStatus(`${goodCount} station${goodCount === 1 ? '' : 's'} · Updated ${formatTime(lastSuccessfulRefresh)}`, goodCount === STATIONS.length ? 'live' : 'warn');
+} catch (error) {
+if (sequence !== requestSequence) return;
+const message = timedOut ? 'Xweather request timed out' : error?.name === 'AbortError' ? 'Xweather request cancelled' : (error?.message || 'Unable to load weather');
+const authError = isAuthError(error);
+authBlocked = authError;
+showCachedOrError(message, authError);
+if (authError && !el.setup.open) {
+el.apiKey.value = getApiKey();
+el.setup.showModal();
+}
+} finally {
+clearTimeout(timeout);
+if (sequence === requestSequence) {
+el.refresh.classList.remove('busy');
+if (requestController === controller) requestController = null;
+}
+}
+}
+function unavailableReason(item, metricKey) {
+if (item.missing) return 'not returned';
+if (item.qc === 0) return 'QC failed';
+if (observationAge(item) > MAX_OBSERVATION_AGE) return 'old observation';
+if (numberOrNull(item[METRICS[metricKey].key]) === null) return 'not reported';
+return '';
+}
+function openDetail(metricKey, trigger) {
+currentMetric = metricKey;
+sortOrder = 'asc';
+detailTrigger = trigger || null;
+el.sortmenu.classList.remove('show');
+el.sort.setAttribute('aria-expanded', 'false');
+renderDetailRows();
+el.detail.showModal();
+}
+function renderDetailRows() {
+const metric = METRICS[currentMetric];
+const item = summary(currentMetric);
+const rows = [...item.a];
+rows.sort((a, b) => sortOrder === 'alpha'
+? a.x.id.localeCompare(b.x.id)
+: sortOrder === 'desc'
+? (b.v - a.v || a.x.id.localeCompare(b.x.id))
+: (a.v - b.v || a.x.id.localeCompare(b.x.id)));
+el.title.textContent = metric.n;
+el.sum.textContent = item.n
+? `${metric.fmt(item.v)} average · ${rangeText(currentMetric, item)} · ${item.n} station${item.n === 1 ? '' : 's'}`
+: 'No current reports';
+el.rows.innerHTML = rows.length ? rows.map(row => `
+<div class="row"><div><div class="name">${escapeHTML(row.x.id)}</div>
+<div class="sub">${row.x.ts ? `Observed ${formatTime(row.x.ts)}` : 'Current observation'}</div></div>
+<div><div class="rval">${escapeHTML(metric.fmt(row.v))}</div>
+${currentMetric === 'wind' && row.x.gust !== null ? `<div class="extra">gust ${Math.round(row.x.gust)} mph</div>` : ''}</div></div>`).join('')
+: '<div class="row"><div class="name">No stations available</div></div>';
+const unavailable = data.filter(row => unavailableReason(row, currentMetric));
+el.unavail.textContent = unavailable.length
+? 'Unavailable: ' + unavailable.map(row => `${row.id} (${unavailableReason(row, currentMetric)})`).join(' · ')
+: '';
+el.sortmenu.querySelectorAll('b').forEach(mark => { mark.textContent = ''; });
+const selected = el.sortmenu.querySelector(`[data-sort="${sortOrder}"] b`);
+if (selected) selected.textContent = '✓';
+}
+el.sort.setAttribute('aria-expanded', 'false');
+el.sort.setAttribute('aria-controls', 'sortmenu');
+el.sort.addEventListener('click', event => {
+event.stopPropagation();
+const open = !el.sortmenu.classList.contains('show');
+el.sortmenu.classList.toggle('show', open);
+el.sort.setAttribute('aria-expanded', String(open));
+});
+el.sortmenu.addEventListener('click', event => {
+const button = event.target.closest('button');
+if (!button) return;
+sortOrder = button.dataset.sort;
+el.sortmenu.classList.remove('show');
+el.sort.setAttribute('aria-expanded', 'false');
+renderDetailRows();
+});
+el.close.addEventListener('click', () => el.detail.close());
+el.detail.addEventListener('click', event => {
+if (event.target === el.detail) el.detail.close();
+el.sortmenu.classList.remove('show');
+el.sort.setAttribute('aria-expanded', 'false');
+});
+el.detail.addEventListener('close', () => {
+if (detailTrigger?.isConnected) {
+try { detailTrigger.focus({ preventScroll: true }); }
+catch { detailTrigger.focus(); }
+}
+detailTrigger = null;
+});
+el.settings.addEventListener('click', () => {
+el.apiKey.value = getApiKey();
+if (!el.setup.open) el.setup.showModal();
+});
+el.setupClose.addEventListener('click', () => el.setup.close());
+el.clear.addEventListener('click', () => {
+clearApiKey();
+authBlocked = false;
+el.apiKey.value = '';
+setStatus('Xweather API key required', 'warn');
+showToast('Saved API key cleared');
+});
+el.form.addEventListener('submit', event => {
+event.preventDefault();
+const parsed = parseCombinedKey(el.apiKey.value);
+if (!parsed) {
+showToast('Paste the complete Xweather API key, including its underscore');
+el.apiKey.focus();
+return;
+}
+const persisted = saveApiKey(parsed.key);
+authBlocked = false;
+el.setup.close();
+if (!persisted) showToast('API key loaded for this session only');
+load();
+});
+el.refresh.addEventListener('click', () => {
+authBlocked = false;
+load({ promptForKey: true });
+});
+document.addEventListener('visibilitychange', () => {
+if (!document.hidden && getApiKey() && !authBlocked && Date.now() - lastSuccessfulRefresh > REFRESH_INTERVAL) load();
+});
+setInterval(() => {
+if (!document.hidden && getApiKey() && !authBlocked && Date.now() - lastSuccessfulRefresh > REFRESH_INTERVAL) load();
+}, 30000);
+renderShell();
+const cached = readCache();
+if (cached) {
+data = cached.data;
+render();
+setStatus(`Cached · ${formatTime(cached.at)}`, 'warn');
+}
+load({ promptForKey: true });
+})();</script></body></html>
