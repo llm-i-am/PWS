@@ -1,0 +1,59 @@
+name: Finalize PWS v2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/finalize-v2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Rebuild and validate index.html
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .stage/v2/01.b64 .stage/v2/02.b64 .stage/v2/03.b64 .stage/v2/04.b64 | tr -d '\r\n ' | base64 --decode > index.html
+          test -s index.html
+          grep -q '<!-- Version 2 -->' index.html
+          grep -q 'Xweather API Key' index.html
+          grep -q 'function parseCombinedKey' index.html
+          grep -q 'client_id: credentials.id' index.html
+          grep -q 'client_secret: credentials.secret' index.html
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, subprocess, tempfile
+          text = Path('index.html').read_text(encoding='utf-8')
+          assert text.count('id="apiKey"') == 1
+          assert 'id="cid"' not in text
+          assert 'id="secret"' not in text
+          m = re.search(r'<script>(.*?)</script>', text, re.S)
+          assert m, 'inline script not found'
+          with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False) as f:
+              f.write(m.group(1))
+              js = f.name
+          subprocess.run(['node', '--check', js], check=True)
+          PY
+
+      - name: Commit final site and remove temporary staging
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .stage
+          rm -f .github/workflows/finalize-v2.yml
+          rmdir .github/workflows 2>/dev/null || true
+          rmdir .github 2>/dev/null || true
+          git config user.name 'llm-i-am'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Accept combined Xweather API key'
+          git push origin HEAD:main
