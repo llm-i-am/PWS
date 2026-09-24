@@ -1,0 +1,152 @@
+em => item.v)),
+max: Math.max(...items.map(item => item.v)),
+s: metricKey === 'wind' ? averageWindDirection(items) : ''
+};
+}
+function rangeText(metricKey, item) {
+if (!item.n) return 'No current reports';
+const metric = METRICS[metricKey];
+const low = metric.rv(item.min);
+const high = metric.rv(item.max);
+const values = low === high ? low : `${low}–${high}`;
+return `${values}${metric.gap}${metric.unit}`;
+}
+function renderShell() {
+el.grid.innerHTML = Object.keys(METRICS).map(metricKey => `
+<button class="metric ${metricKey === 'precip' ? 'wide' : ''} loading" data-k="${metricKey}" aria-haspopup="dialog">
+<div><span class="label">${METRICS[metricKey].n}</span><span class="count" id="c-${metricKey}">(0)</span></div>
+<div class="${metricKey === 'precip' ? 'right' : ''}">
+<div class="val" id="v-${metricKey}">—</div><div class="range" id="r-${metricKey}">—</div>
+</div>
+</button>`).join('');
+el.grid.querySelectorAll('.metric').forEach(button => {
+button.addEventListener('click', () => openDetail(button.dataset.k, button));
+});
+}
+function render() {
+for (const metricKey of Object.keys(METRICS)) {
+const item = summary(metricKey);
+const valueEl = $(`v-${metricKey}`);
+$(`c-${metricKey}`).textContent = `(${item.n})`;
+valueEl.innerHTML = item.n
+? `${escapeHTML(METRICS[metricKey].fmt(item.v))}${item.s ? `<span class="suffix">${item.s}</span>` : ''}`
+: '—';
+$(`r-${metricKey}`).textContent = rangeText(metricKey, item);
+valueEl.closest('.metric').classList.remove('loading');
+}
+if (el.detail.open) renderDetailRows();
+}
+function setStatus(text, state = '') {
+el.status.textContent = text;
+el.dot.className = `dot ${state}`;
+}
+function showToast(text) {
+el.toast.textContent = text;
+el.toast.classList.add('show');
+clearTimeout(toastTimer);
+toastTimer = setTimeout(() => el.toast.classList.remove('show'), 3000);
+}
+function formatTime(stamp) {
+return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(new Date(stamp));
+}
+function normalizeResponse(json) {
+const response = Array.isArray(json?.response) ? json.response : json?.response ? [json.response] : [];
+return STATIONS.map(([id, lat, lon]) => {
+const result = response.find(item => String(item?.id || '').toUpperCase() === id.toUpperCase());
+const ob = result?.ob || {};
+const seconds = numberOrNull(ob.timestamp);
+const parsedISO = Date.parse(ob.dateTimeISO || '');
+return {
+id, lat, lon, missing: !result,
+ts: seconds !== null ? seconds * 1000 : Number.isFinite(parsedISO) ? parsedISO : 0,
+temp: numberOrNull(ob.tempF), humidity: numberOrNull(ob.humidity), pressure: numberOrNull(ob.pressureMB),
+wind: numberOrNull(ob.windSpeedMPH), dir: numberOrNull(ob.windDirDEG), gust: numberOrNull(ob.windGustMPH),
+precip: numberOrNull(ob.precipIN), qc: numberOrNull(ob.QCcode), trust: numberOrNull(ob.trustFactor)
+};
+});
+}
+function writeCache(items) {
+try { localStorage.setItem(STORAGE_PREFIX + 'cache', JSON.stringify({ at: Date.now(), data: items })); }
+catch { /* Cache is optional. */ }
+}
+function readCache() {
+try {
+const cached = JSON.parse(localStorage.getItem(STORAGE_PREFIX + 'cache') || 'null');
+return cached && Array.isArray(cached.data) && Number.isFinite(Number(cached.at)) ? cached : null;
+} catch { return null; }
+}
+function apiError(json, response) {
+const err = json?.error;
+const message = typeof err === 'string'
+? err
+: err?.description || err?.message || err?.code || `HTTP ${response.status}`;
+const error = new Error(message);
+error.status = response.status;
+error.code = err?.code || '';
+return error;
+}
+function isAuthError(error) {
+const text = `${error?.code || ''} ${error?.message || ''}`.toLowerCase();
+return error?.status === 401 || error?.status === 403 || text.includes('unauthorized') || text.includes('namespace') || text.includes('credential');
+}
+function showCachedOrError(message, authError = false) {
+const cached = readCache();
+if (cached) {
+data = cached.data;
+render();
+setStatus(`${authError ? 'API key issue · ' : 'Cached · '}${formatTime(cached.at)}`, authError ? 'bad' : 'warn');
+showToast(authError ? 'Check the Xweather API key or its namespace' : `${message} · showing cached data`);
+} else {
+data = [];
+render();
+setStatus(authError ? 'Xweather API key needs attention' : 'Weather unavailable', 'bad');
+showToast(authError ? 'Check the Xweather API key or its namespace' : message);
+}
+}
+async function load({ promptForKey = false } = {}) {
+const credentials = parseCombinedKey(getApiKey());
+if (!credentials) {
+const cached = readCache();
+if (cached) {
+data = cached.data;
+render();
+setStatus(`Cached · ${formatTime(cached.at)}`, 'warn');
+} else {
+setStatus('Xweather API key required', 'warn');
+}
+if (promptForKey && !el.setup.open) {
+el.apiKey.value = getApiKey();
+el.setup.showModal();
+}
+return;
+}
+const sequence = ++requestSequence;
+if (requestController) requestController.abort();
+const controller = new AbortController();
+requestController = controller;
+let timedOut = false;
+const timeout = setTimeout(() => { timedOut = true; controller.abort(); }, REQUEST_TIMEOUT);
+el.refresh.classList.add('busy');
+setStatus('Updating stations…');
+const params = new URLSearchParams({
+query: STATIONS.map(station => `id:${station[0]}`).join(';'),
+filter: 'allstations,precise',
+limit: String(STATIONS.length),
+fields: FIELDS,
+client_id: credentials.id,
+client_secret: credentials.secret
+});
+try {
+const response = await fetch(`${API}?${params}`, {
+cache: 'no-store', credentials: 'omit', signal: controller.signal,
+headers: { Accept: 'application/json' }
+});
+const text = await response.text();
+let json;
+try { json = JSON.parse(text); }
+catch { throw Object.assign(new Error(`Xweather returned an unreadable response (HTTP ${response.status})`), { status: response.status }); }
+if (sequence !== requestSequence) return;
+if (!response.ok || json?.success === false) throw apiError(json, response);
+const normalized = normalizeResponse(json);
+const goodCount = normalized.filter(usable).length;
+if (!goodCount) throw new Error('No current station observations returne
