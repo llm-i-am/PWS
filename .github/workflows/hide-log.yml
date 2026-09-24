@@ -1,0 +1,78 @@
+name: Hide diagnostics control
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/hide-log.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  hide-log:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Back up and hide diagnostics button
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo '089b860905c25a853772435461b1d2c6d3f631a13fe1800a1fb35b4569470710  index.html' | sha256sum -c -
+          mkdir -p backups/v3
+          cp index.html backups/v3/index.html
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          text = p.read_text(encoding='utf-8')
+          old_toast = 'bottom:calc(66px + var(--sb))'
+          new_toast = 'bottom:calc(14px + var(--sb))'
+          assert text.count(old_toast) == 1, 'unexpected toast offset state'
+          text = text.replace(old_toast, new_toast, 1)
+          old_btn = '<button id="log" class="logbtn" type="button" aria-label="Copy diagnostic log" title="Copy diagnostic log">LOG</button>'
+          new_btn = '<!-- Diagnostics control intentionally hidden; remove the hidden attribute to re-enable it. --><button id="log" class="logbtn" type="button" hidden aria-label="Copy diagnostic log" title="Copy diagnostic log">LOG</button>'
+          assert text.count(old_btn) == 1, 'unexpected diagnostics button state'
+          text = text.replace(old_btn, new_btn, 1)
+          marker = '.logbtn:active{transform:scale(.9);background:var(--gs)}'
+          hidden_rule = '.logbtn[hidden]{display:none!important}'
+          assert text.count(marker) == 1, 'log button style marker not found'
+          assert hidden_rule not in text, 'hidden rule already present'
+          text = text.replace(marker, marker + hidden_rule, 1)
+          p.write_text(text, encoding='utf-8')
+          PY
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, subprocess, tempfile
+          text = Path('index.html').read_text(encoding='utf-8')
+          assert text.count('id="log"') == 1
+          assert text.count('id="log" class="logbtn" type="button" hidden') == 1
+          assert '.logbtn[hidden]{display:none!important}' in text
+          assert 'bottom:calc(66px + var(--sb))' not in text
+          assert 'bottom:calc(14px + var(--sb))' in text
+          assert 'function copyDiagnostics()' in text
+          assert "el.log.addEventListener('click', copyDiagnostics);" in text
+          m = re.search(r'<script>(.*?)</script>', text, re.S)
+          assert m, 'inline script not found'
+          with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False) as f:
+              f.write(m.group(1))
+              js = f.name
+          subprocess.run(['node', '--check', js], check=True)
+          PY
+          test "$(git hash-object backups/v3/index.html)" = '9760459e93cf0f68af8418e48a4ac427b376aa43'
+
+      - name: Commit final site and remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/hide-log.yml
+          rmdir .github/workflows 2>/dev/null || true
+          rmdir .github 2>/dev/null || true
+          git config user.name 'llm-i-am'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Hide diagnostic log control'
+          git push origin HEAD:main
