@@ -1,28 +1,31 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light dark"><meta name="theme-color" media="(prefers-color-scheme:light)" content="#edf5fc"><meta name="theme-color" media="(prefers-color-scheme:dark)" content="#07111c"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="format-detection" content="telephone=no"><title>Local Weather</title><!-- Version 2 --><style>
-:root{color-scheme:light dark;--p:#edf5fc;--p2:#fbfdff;--i:#0a1119;--m:rgba(10,17,25,.58);--f:rgba(10,17,25,.39);--line:rgba(20,40,60,.10);--card:rgba(255,255,255,.76);--g:rgba(248,252,255,.48);--gs:rgba(248,252,255,.68);--edge:rgba(255,255,255,.72);--a:#007aff;--ok:#248a3d;--warn:#9a6400;--bad:#c9342f;--st:env(safe-area-inset-top,0px);--sr:env(safe-area-inset-right,0px);--sb:env(safe-area-inset-bottom,0px);--sl:env(safe-area-inset-left,0px)}@media(prefers-color-scheme:dark){:root{--p:#07111c;--p2:#0b1724;--i:#f5f9fc;--m:rgba(245,249,252,.64);--f:rgba(245,249,252,.40);--line:rgba(255,255,255,.10);--card:rgba(18,31,44,.76);--g:rgba(31,48,65,.46);--gs:rgba(35,53,71,.68);--edge:rgba(255,255,255,.18);--a:#0a84ff;--ok:#30d158;--warn:#ffb340;--bad:#ff6961}}*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--p);-webkit-text-size-adjust:100%}body{min-height:100svh;color:var(--i);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:radial-gradient(650px 380px at -12% -5%,rgba(66,190,255,.23),transparent 62%),radial-gradient(540px 430px at 112% 32%,rgba(80,225,190,.14),transparent 66%),linear-gradient(180deg,var(--p2),var(--p));overscroll-behavior-y:none}button,input{font:inherit;-webkit-tap-highlight-color:transparent}button{touch-action:manipulation}.app{width:min(100%,480px);min-height:100svh;margin:auto;padding:calc(12px + var(--st)) max(14px,calc(14px + var(--sr))) calc(10px + var(--sb)) max(14px,calc(14px + var(--sl)));display:flex;flex-direction:column;gap:10px}.top{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 2px}.top h1{margin:0;font-size:32px;line-height:1;letter-spacing:-.045em;font-weight:790}.status{margin-top:8px;display:flex;align-items:center;gap:7px;color:var(--m);font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dot{width:7px;height:7px;border-radius:50%;background:var(--f);box-shadow:0 0 0 4px rgba(127,127,127,.08)}.dot.live{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.bad{background:var(--bad)}.glass{background:linear-gradient(145deg,rgba(255,255,255,.16),transparent 42%),var(--g);border:1px solid var(--edge);box-shadow:0 18px 52px rgba(24,54,82,.17),inset 0 1px 0 rgba(255,255,255,.45);-webkit-backdrop-filter:blur(24px) saturate(175%);backdrop-filter:blur(24px) saturate(175%)}.tools{display:flex;padding:3px;border-radius:999px}.icon{width:46px;height:46px;border:0;border-radius:50%;padding:0;color:var(--i);background:transparent;display:grid;place-items:center}.icon:active{transform:scale(.91);background:rgba(127,127,127,.12)}.icon svg{width:21px;height:21px}.icon.busy svg{animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}main{flex:1;min-height:0;display:flex;align-items:center}.panel{width:100%;border-radius:34px;overflow:hidden;background:var(--card);border:1px solid var(--line);box-shadow:0 18px 55px rgba(30,66,95,.10),inset 0 1px 0 rgba(255,255,255,.18);-webkit-backdrop-filter:blur(16px) saturate(125%);backdrop-filter:blur(16px) saturate(125%)}.grid{display:grid;grid-template-columns:1fr 1fr}.metric{position:relative;min-height:127px;padding:16px;border:0;color:inherit;background:transparent;text-align:left;overflow:hidden}.metric:nth-child(odd):not(.wide){border-right:1px solid var(--line)}.metric:nth-child(-n+4){border-bottom:1px solid var(--line)}.metric:active{background:color-mix(in srgb,var(--a) 6%,transparent);transform:scale(.985)}.wide{grid-column:1/-1;min-height:90px;display:flex;align-items:center;justify-content:space-between;gap:18px}.label{font-size:14px;font-weight:720}.count{margin-left:4px;color:var(--m);font-size:12px;font-weight:650}.val{margin-top:13px;font-size:clamp(27px,8vw,33px);line-height:1;font-weight:730;letter-spacing:-.045em;font-variant-numeric:tabular-nums;white-space:nowrap}.wide .val{margin:0;text-align:right}.suffix{margin-left:5px;color:var(--m);font-size:14px;font-weight:700}.range{margin-top:7px;min-height:15px;color:var(--m);font-size:11.5px;font-weight:590;font-variant-numeric:tabular-nums;white-space:nowrap}.wide .right{text-align:right}.loading .val,.loading .range{color:transparent;border-radius:999px;background:linear-gradient(100deg,rgba(127,127,127,.09) 20%,rgba(255,255,255,.32) 42%,rgba(127,127,127,.09) 64%);background-size:220% 100%;animation:sh 1.2s infinite}.loading .val{width:85px;height:30px}.loading .range{width:68px;height:12px}@keyframes sh{to{background-position:-120% 0}}footer{min-height:24px;display:flex;justify-content:center;align-items:center;color:var(--f);font-size:10.5px;font-weight:580}footer a{color:inherit;text-decoration:none;font-weight:700}dialog{padding:0;border:0;background:transparent;color:var(--i);overflow:visible}dialog::backdrop{background:rgba(4,12,20,.22);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}.dlg{width:min(calc(100% - 24px),420px);margin:auto}.surf{position:relative;max-height:calc(100svh - var(--st) - var(--sb) - 24px);overflow:auto;border-radius:32px;background:linear-gradient(145deg,rgba(255,255,255,.18),transparent 40%),var(--gs);border:1px solid var(--edge);box-shadow:0 28px 78px rgba(8,26,44,.30),inset 0 1px 0 rgba(255,255,255,.34);-webkit-backdrop-filter:blur(34px) saturate(185%);backdrop-filter:blur(34px) saturate(185%);padding:14px}.head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:4px 2px 11px 5px}.head h2{margin:0;font-size:23px;line-height:1.05;letter-spacing:-.035em}.sum{margin-top:6px;color:var(--m);font-size:12px;font-weight:620}.acts{display:flex;gap:4px;position:relative}.dicon{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);color:var(--i);background:rgba(127,127,127,.075);display:grid;place-items:center}.dicon svg{width:19px;height:19px}.dicon:active{transform:scale(.9)}.sortmenu{position:absolute;right:48px;top:48px;z-index:4;width:180px;padding:6px;border-radius:20px;display:none}.sortmenu.show{display:block}.sortmenu button{width:100%;min-height:44px;border:0;border-radius:14px;padding:0 10px;display:flex;align-items:center;justify-content:space-between;color:var(--i);background:transparent;text-align:left;font-size:13px;font-weight:650}.sortmenu button:active{background:rgba(127,127,127,.12)}.list{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:rgba(127,127,127,.055)}.row{min-height:57px;padding:9px 13px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line)}.row:last-child{border:0}.name{font-size:13.5px;font-weight:690;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub,.extra{margin-top:3px;color:var(--f);font-size:10.5px;font-weight:600}.rval{text-align:right;font-size:15.5px;font-weight:745;font-variant-numeric:tabular-nums;white-space:nowrap}.unavail{padding:10px 8px 0;color:var(--f);font-size:10.5px;line-height:1.35}.setup p{margin:0 5px 13px;color:var(--m);font-size:12.5px;line-height:1.45}.field{display:block;margin:9px 0}.field span{display:block;margin:0 0 5px 5px;color:var(--m);font-size:11px;font-weight:700}.field input{width:100%;height:48px;border-radius:16px;border:1px solid var(--line);padding:0 13px;color:var(--i);background:rgba(127,127,127,.08);font-size:16px;outline:none}.primary{width:100%;height:48px;margin-top:7px;border:0;border-radius:16px;color:white;background:var(--a);font-weight:750}.clear{width:100%;height:44px;margin-top:6px;border:0;border-radius:15px;color:var(--bad);background:transparent;font-weight:650}.toast{position:fixed;z-index:10;left:14px;right:14px;bottom:calc(14px + var(--sb));max-width:440px;margin:auto;padding:12px 15px;border-radius:19px;color:var(--i);font-size:12px;font-weight:650;opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:none}@media(max-height:690px){.app{gap:6px}.top{min-height:66px}.metric{min-height:111px;padding:13px 15px}.wide{min-height:80px}.val{margin-top:10px}footer{min-height:18px}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}@media(prefers-reduced-transparency:reduce){:root{--card:#f8fbff;--g:#f4f8fc;--gs:#f4f8fc}.glass,.panel,.surf,dialog::backdrop{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}@media(prefers-color-scheme:dark) and (prefers-reduced-transparency:reduce){:root{--card:#142231;--g:#172838;--gs:#1a2b3b}}@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.glass,.surf{background:var(--gs)}.panel{background:var(--card)}}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light dark"><meta name="theme-color" media="(prefers-color-scheme:light)" content="#edf5fc"><meta name="theme-color" media="(prefers-color-scheme:dark)" content="#07111c"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="format-detection" content="telephone=no"><title>Local Weather</title><!-- Version 3 --><style>
+:root{color-scheme:light dark;--p:#edf5fc;--p2:#fbfdff;--i:#0a1119;--m:rgba(10,17,25,.58);--f:rgba(10,17,25,.39);--line:rgba(20,40,60,.10);--card:rgba(255,255,255,.76);--g:rgba(248,252,255,.48);--gs:rgba(248,252,255,.68);--edge:rgba(255,255,255,.72);--a:#007aff;--ok:#248a3d;--warn:#9a6400;--bad:#c9342f;--st:env(safe-area-inset-top,0px);--sr:env(safe-area-inset-right,0px);--sb:env(safe-area-inset-bottom,0px);--sl:env(safe-area-inset-left,0px)}@media(prefers-color-scheme:dark){:root{--p:#07111c;--p2:#0b1724;--i:#f5f9fc;--m:rgba(245,249,252,.64);--f:rgba(245,249,252,.40);--line:rgba(255,255,255,.10);--card:rgba(18,31,44,.76);--g:rgba(31,48,65,.46);--gs:rgba(35,53,71,.68);--edge:rgba(255,255,255,.18);--a:#0a84ff;--ok:#30d158;--warn:#ffb340;--bad:#ff6961}}*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--p);-webkit-text-size-adjust:100%}body{min-height:100svh;color:var(--i);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased;background:radial-gradient(650px 380px at -12% -5%,rgba(66,190,255,.23),transparent 62%),radial-gradient(540px 430px at 112% 32%,rgba(80,225,190,.14),transparent 66%),linear-gradient(180deg,var(--p2),var(--p));overscroll-behavior-y:none}button,input{font:inherit;-webkit-tap-highlight-color:transparent}button{touch-action:manipulation}.app{width:min(100%,480px);min-height:100svh;margin:auto;padding:calc(12px + var(--st)) max(14px,calc(14px + var(--sr))) calc(10px + var(--sb)) max(14px,calc(14px + var(--sl)));display:flex;flex-direction:column;gap:10px}.top{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 2px}.top h1{margin:0;font-size:32px;line-height:1;letter-spacing:-.045em;font-weight:790}.status{margin-top:8px;display:flex;align-items:center;gap:7px;color:var(--m);font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dot{width:7px;height:7px;border-radius:50%;background:var(--f);box-shadow:0 0 0 4px rgba(127,127,127,.08)}.dot.live{background:var(--ok)}.dot.warn{background:var(--warn)}.dot.bad{background:var(--bad)}.glass{background:linear-gradient(145deg,rgba(255,255,255,.16),transparent 42%),var(--g);border:1px solid var(--edge);box-shadow:0 18px 52px rgba(24,54,82,.17),inset 0 1px 0 rgba(255,255,255,.45);-webkit-backdrop-filter:blur(24px) saturate(175%);backdrop-filter:blur(24px) saturate(175%)}.tools{display:flex;padding:3px;border-radius:999px}.icon{width:46px;height:46px;border:0;border-radius:50%;padding:0;color:var(--i);background:transparent;display:grid;place-items:center}.icon:active{transform:scale(.91);background:rgba(127,127,127,.12)}.icon svg{width:21px;height:21px}.icon.busy svg{animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}main{flex:1;min-height:0;display:flex;align-items:center}.panel{width:100%;border-radius:34px;overflow:hidden;background:var(--card);border:1px solid var(--line);box-shadow:0 18px 55px rgba(30,66,95,.10),inset 0 1px 0 rgba(255,255,255,.18);-webkit-backdrop-filter:blur(16px) saturate(125%);backdrop-filter:blur(16px) saturate(125%)}.grid{display:grid;grid-template-columns:1fr 1fr}.metric{position:relative;min-height:127px;padding:16px;border:0;color:inherit;background:transparent;text-align:left;overflow:hidden}.metric:nth-child(odd):not(.wide){border-right:1px solid var(--line)}.metric:nth-child(-n+4){border-bottom:1px solid var(--line)}.metric:active{background:color-mix(in srgb,var(--a) 6%,transparent);transform:scale(.985)}.wide{grid-column:1/-1;min-height:90px;display:flex;align-items:center;justify-content:space-between;gap:18px}.label{font-size:14px;font-weight:720}.count{margin-left:4px;color:var(--m);font-size:12px;font-weight:650}.val{margin-top:13px;font-size:clamp(27px,8vw,33px);line-height:1;font-weight:730;letter-spacing:-.045em;font-variant-numeric:tabular-nums;white-space:nowrap}.wide .val{margin:0;text-align:right}.suffix{margin-left:5px;color:var(--m);font-size:14px;font-weight:700}.range{margin-top:7px;min-height:15px;color:var(--m);font-size:11.5px;font-weight:590;font-variant-numeric:tabular-nums;white-space:nowrap}.wide .right{text-align:right}.loading .val,.loading .range{color:transparent;border-radius:999px;background:linear-gradient(100deg,rgba(127,127,127,.09) 20%,rgba(255,255,255,.32) 42%,rgba(127,127,127,.09) 64%);background-size:220% 100%;animation:sh 1.2s infinite}.loading .val{width:85px;height:30px}.loading .range{width:68px;height:12px}@keyframes sh{to{background-position:-120% 0}}footer{min-height:24px;display:flex;justify-content:center;align-items:center;color:var(--f);font-size:10.5px;font-weight:580}footer a{color:inherit;text-decoration:none;font-weight:700}dialog{padding:0;border:0;background:transparent;color:var(--i);overflow:visible}dialog::backdrop{background:rgba(4,12,20,.22);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}.dlg{width:min(calc(100% - 24px),420px);margin:auto}.surf{position:relative;max-height:calc(100svh - var(--st) - var(--sb) - 24px);overflow:auto;border-radius:32px;background:linear-gradient(145deg,rgba(255,255,255,.18),transparent 40%),var(--gs);border:1px solid var(--edge);box-shadow:0 28px 78px rgba(8,26,44,.30),inset 0 1px 0 rgba(255,255,255,.34);-webkit-backdrop-filter:blur(34px) saturate(185%);backdrop-filter:blur(34px) saturate(185%);padding:14px}.head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:4px 2px 11px 5px}.head h2{margin:0;font-size:23px;line-height:1.05;letter-spacing:-.035em}.sum{margin-top:6px;color:var(--m);font-size:12px;font-weight:620}.acts{display:flex;gap:4px;position:relative}.dicon{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);color:var(--i);background:rgba(127,127,127,.075);display:grid;place-items:center}.dicon svg{width:19px;height:19px}.dicon:active{transform:scale(.9)}.sortmenu{position:absolute;right:48px;top:48px;z-index:4;width:180px;padding:6px;border-radius:20px;display:none}.sortmenu.show{display:block}.sortmenu button{width:100%;min-height:44px;border:0;border-radius:14px;padding:0 10px;display:flex;align-items:center;justify-content:space-between;color:var(--i);background:transparent;text-align:left;font-size:13px;font-weight:650}.sortmenu button:active{background:rgba(127,127,127,.12)}.list{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:rgba(127,127,127,.055)}.row{min-height:57px;padding:9px 13px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line)}.row:last-child{border:0}.name{font-size:13.5px;font-weight:690;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.sub,.extra{margin-top:3px;color:var(--f);font-size:10.5px;font-weight:600}.rval{text-align:right;font-size:15.5px;font-weight:745;font-variant-numeric:tabular-nums;white-space:nowrap}.unavail{padding:10px 8px 0;color:var(--f);font-size:10.5px;line-height:1.35}.setup p{margin:0 5px 13px;color:var(--m);font-size:12.5px;line-height:1.45}.field{display:block;margin:9px 0}.field span{display:block;margin:0 0 5px 5px;color:var(--m);font-size:11px;font-weight:700}.field input{width:100%;height:48px;border-radius:16px;border:1px solid var(--line);padding:0 13px;color:var(--i);background:rgba(127,127,127,.08);font-size:16px;outline:none}.primary{width:100%;height:48px;margin-top:7px;border:0;border-radius:16px;color:white;background:var(--a);font-weight:750}.clear{width:100%;height:44px;margin-top:6px;border:0;border-radius:15px;color:var(--bad);background:transparent;font-weight:650}.toast{position:fixed;z-index:10;left:14px;right:14px;bottom:calc(66px + var(--sb));max-width:440px;margin:auto;padding:12px 15px;border-radius:19px;color:var(--i);font-size:12px;font-weight:650;opacity:0;transform:translateY(12px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:none}.logbtn{position:fixed;z-index:9;right:max(12px,calc(12px + var(--sr)));bottom:calc(12px + var(--sb));width:46px;height:46px;border-radius:50%;border:1px solid var(--edge);color:var(--m);background:linear-gradient(145deg,rgba(255,255,255,.16),transparent 42%),var(--g);box-shadow:0 12px 32px rgba(24,54,82,.16),inset 0 1px 0 rgba(255,255,255,.35);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);font-size:10px;font-weight:800;letter-spacing:.04em}.logbtn:active{transform:scale(.9);background:var(--gs)}@media(max-height:690px){.app{gap:6px}.top{min-height:66px}.metric{min-height:111px;padding:13px 15px}.wide{min-height:80px}.val{margin-top:10px}footer{min-height:18px}}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}@media(prefers-reduced-transparency:reduce){:root{--card:#f8fbff;--g:#f4f8fc;--gs:#f4f8fc}.glass,.panel,.surf,dialog::backdrop{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}}@media(prefers-color-scheme:dark) and (prefers-reduced-transparency:reduce){:root{--card:#142231;--g:#172838;--gs:#1a2b3b}}@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){.glass,.surf{background:var(--gs)}.panel{background:var(--card)}}
 </style></head><body><div class="app"><header class="top"><div><h1>Local Weather</h1><div class="status"><i id="dot" class="dot"></i><span id="status">Loading local stations…</span></div></div><div class="tools glass"><button id="refresh" class="icon" aria-label="Refresh weather"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></button><button id="settings" class="icon" aria-label="Xweather settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21h-4v-.1A1.7 1.7 0 0 0 8.6 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3v-4h.1A1.7 1.7 0 0 0 4.6 8.6a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.1A1.7 1.7 0 0 0 15.4 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.1.37.31.7.6 1 .3.26.69.4 1.1.4h.1v4h-.1c-.41 0-.8.14-1.1.4-.29.3-.5.63-.6 1z"/></svg></button></div></header><main><section class="panel"><div id="grid" class="grid"></div></section></main><footer>PWSweather stations · <a href="https://www.xweather.com/" target="_blank" rel="noopener">powered by Vaisala Xweather</a></footer></div>
 <dialog id="detail" class="dlg"><div class="surf"><div class="head"><div><h2 id="dtitle">Metric</h2><div id="dsum" class="sum"></div></div><div class="acts"><button id="sort" class="dicon" aria-label="Sort stations"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h12M8 12h9M8 18h6M4 5v14m0 0-2-2m2 2 2-2"/></svg></button><div id="sortmenu" class="sortmenu glass"><button data-sort="asc">Low → High <b></b></button><button data-sort="desc">High → Low <b></b></button><button data-sort="alpha">Station A → Z <b></b></button></div><button id="close" class="dicon" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div></div><div id="rows" class="list"></div><div id="unavail" class="unavail"></div></div></dialog>
-<dialog id="setup" class="dlg setup"><form id="form" class="surf" method="dialog"><div class="head"><div><h2>Xweather Access</h2><div class="sum">One-time setup on this device</div></div><button id="setupClose" type="button" class="dicon" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><p>Paste the API key exactly as Xweather provides it. This site splits the combined key locally into the client ID and secret required by the Weather API. For GitHub Pages, restrict the key namespace to <b>llm-i-am.github.io</b>. The key stays in this browser.</p><label class="field"><span>Xweather API Key</span><input id="apiKey" type="password" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="client_id_client_secret" aria-describedby="keyHelp"></label><p id="keyHelp">Use the complete key, including the underscore between its two parts.</p><button class="primary" value="default">Save & Load Weather</button><button id="clear" type="button" class="clear">Clear saved API key</button></form></dialog><div id="toast" class="toast glass" role="status" aria-live="polite"></div><script>(()=>{
+<dialog id="setup" class="dlg setup"><form id="form" class="surf" method="dialog"><div class="head"><div><h2>Xweather Access</h2><div class="sum">One-time setup on this device</div></div><button id="setupClose" type="button" class="dicon" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div><p>Paste the API key exactly as Xweather provides it. This site splits the combined key locally into the client ID and secret required by the Weather API. For GitHub Pages, restrict the key namespace to <b>llm-i-am.github.io</b>. The key stays in this browser.</p><label class="field"><span>Xweather API Key</span><input id="apiKey" type="password" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="client_id_client_secret" aria-describedby="keyHelp"></label><p id="keyHelp">Use the complete key, including the underscore between its two parts.</p><button class="primary" value="default">Save & Load Weather</button><button id="clear" type="button" class="clear">Clear saved API key</button></form></dialog><div id="toast" class="toast glass" role="status" aria-live="polite"></div><button id="log" class="logbtn" type="button" aria-label="Copy diagnostic log" title="Copy diagnostic log">LOG</button><script>(()=>{
 'use strict';
+const APP_VERSION = '3.0.0';
 const STATIONS = [
-['PWS_MARSHPOINTE', 28.022, -82.648],
-['MID_1905W', 28.029, -82.664],
-['MID_1906W', 28.043, -82.668],
-['MID_1789W', 27.99, -82.687],
-['MID_1832W', 28.016, -82.696]
+{ label: 'PWS_MARSHPOINTE', ids: ['PWS_MARSHPOINTE'], lat: 28.022, lon: -82.648 },
+{ label: 'MID_1905W', ids: ['MID_1905W', '1905W'], lat: 28.029, lon: -82.664 },
+{ label: 'MID_1906W', ids: ['MID_1906W', '1906W'], lat: 28.043, lon: -82.668 },
+{ label: 'MID_1789W', ids: ['MID_1789W', '1789W'], lat: 27.99, lon: -82.687 },
+{ label: 'MID_1832W', ids: ['MID_1832W', '1832W'], lat: 28.016, lon: -82.696 }
 ];
+const QUERY_IDS = [...new Set(STATIONS.flatMap(station => station.ids.map(id => id.toUpperCase())))];
 const STORAGE_PREFIX = 'pws-local:v1:';
 const API = 'https://data.api.xweather.com/observations/search';
-const FIELDS = 'id,ob.timestamp,ob.dateTimeISO,ob.tempF,ob.humidity,ob.pressureMB,ob.windSpeedMPH,ob.windDirDEG,ob.windDir,ob.windGustMPH,ob.precipIN,ob.QCcode,ob.trustFactor';
+const FIELDS = 'id,dataSource,loc.lat,loc.long,place.name,ob.timestamp,ob.dateTimeISO,ob.tempF,ob.humidity,ob.pressureMB,ob.windSpeedMPH,ob.windDirDEG,ob.windDir,ob.windGustMPH,ob.precipIN,ob.QCcode,ob.trustFactor';
 const MAX_OBSERVATION_AGE = 90 * 60 * 1000;
 const REFRESH_INTERVAL = 5 * 60 * 1000;
 const REQUEST_TIMEOUT = 12000;
+const DIAG_LIMIT = 350;
 const $ = id => document.getElementById(id);
 const el = {
 grid: $('grid'), status: $('status'), dot: $('dot'), refresh: $('refresh'), settings: $('settings'),
 detail: $('detail'), title: $('dtitle'), sum: $('dsum'), rows: $('rows'), unavail: $('unavail'),
 sort: $('sort'), sortmenu: $('sortmenu'), close: $('close'), setup: $('setup'), form: $('form'),
-apiKey: $('apiKey'), setupClose: $('setupClose'), clear: $('clear'), toast: $('toast')
+apiKey: $('apiKey'), setupClose: $('setupClose'), clear: $('clear'), toast: $('toast'), log: $('log')
 };
 const METRICS = {
 temp: { n: 'Temp', key: 'temp', fmt: v => `${v.toFixed(1)}°F`, rv: v => String(Math.round(v)), unit: '°F', gap: '' },
@@ -41,6 +44,7 @@ let requestSequence = 0;
 let authBlocked = false;
 let memoryApiKey = '';
 let detailTrigger = null;
+let diagnostics = [];
 const numberOrNull = value => value === null || value === '' || value === undefined
 ? null
 : Number.isFinite(Number(value)) ? Number(value) : null;
@@ -98,6 +102,129 @@ memoryApiKey = '';
 storageRemove(STORAGE_PREFIX + 'key');
 storageRemove(STORAGE_PREFIX + 'id');
 storageRemove(STORAGE_PREFIX + 'secret');
+}
+function redactText(value) {
+let text = String(value ?? '');
+text = text.replace(/([?&](?:client_id|client_secret|api_key)=)[^&\s]+/gi, '$1[REDACTED]');
+const key = memoryApiKey || storageGet(STORAGE_PREFIX + 'key');
+if (key) {
+const parsed = parseCombinedKey(key);
+for (const secret of [key, parsed?.id, parsed?.secret].filter(Boolean)) text = text.split(secret).join('[REDACTED]');
+}
+return text;
+}
+function safeDetail(value, depth = 0) {
+if (depth > 4) return '[depth-limit]';
+if (value === null || value === undefined || typeof value === 'number' || typeof value === 'boolean') return value;
+if (typeof value === 'string') return redactText(value).slice(0, 1200);
+if (Array.isArray(value)) return value.slice(0, 40).map(item => safeDetail(item, depth + 1));
+if (typeof value === 'object') {
+const out = {};
+for (const [key, item] of Object.entries(value).slice(0, 60)) {
+if (/secret|api.?key|authorization|client.?id/i.test(key)) out[key] = '[REDACTED]';
+else out[key] = safeDetail(item, depth + 1);
+}
+return out;
+}
+return String(value);
+}
+function persistDiagnostics() {
+try { sessionStorage.setItem(STORAGE_PREFIX + 'diag', JSON.stringify(diagnostics.slice(-DIAG_LIMIT))); }
+catch { /* Diagnostic persistence is optional. */ }
+}
+function restoreDiagnostics() {
+try {
+const restored = JSON.parse(sessionStorage.getItem(STORAGE_PREFIX + 'diag') || '[]');
+if (Array.isArray(restored)) diagnostics = restored.slice(-DIAG_LIMIT);
+} catch { diagnostics = []; }
+}
+function diag(level, event, detail = {}) {
+const entry = { at: new Date().toISOString(), level, event, detail: safeDetail(detail) };
+diagnostics.push(entry);
+if (diagnostics.length > DIAG_LIMIT) diagnostics = diagnostics.slice(-DIAG_LIMIT);
+persistDiagnostics();
+try {
+const method = level === 'error' ? 'error' : level === 'warn' ? 'warn' : 'log';
+console[method]('[PWS]', event, entry.detail);
+} catch { /* Console logging is best effort. */ }
+}
+function keyDiagnostics() {
+const raw = getApiKey();
+const parsed = parseCombinedKey(raw);
+return { present: Boolean(raw), validCombinedFormat: Boolean(parsed), combinedLength: raw.length, clientIdLength: parsed?.id.length || 0, clientSecretLength: parsed?.secret.length || 0 };
+}
+function diagnosticReport() {
+const metricState = Object.fromEntries(Object.keys(METRICS).map(key => {
+const item = summary(key);
+return [key, { contributors: item.n, average: item.v, min: item.min, max: item.max }];
+}));
+const report = [
+'PWS Local Weather diagnostic log',
+`App version: ${APP_VERSION}`,
+`Generated: ${new Date().toISOString()}`,
+`Page: ${location.origin}${location.pathname}`,
+`Hostname: ${location.hostname}`,
+`Referrer: ${document.referrer || '(none)'}`,
+`Secure context: ${window.isSecureContext}`,
+`Online: ${navigator.onLine}`,
+`Visibility: ${document.visibilityState}`,
+`User agent: ${navigator.userAgent}`,
+`Viewport: ${window.innerWidth}x${window.innerHeight} @ ${window.devicePixelRatio || 1}x`,
+`Screen: ${screen.width}x${screen.height}`,
+`API key diagnostics: ${JSON.stringify(keyDiagnostics())}`,
+`Configured stations: ${JSON.stringify(STATIONS.map(s => ({ label: s.label, aliases: s.ids, lat: s.lat, lon: s.lon })))}`,
+`Current status: ${el.status?.textContent || ''}`,
+`Metric state: ${JSON.stringify(metricState)}`,
+'NOTE: API credentials are intentionally redacted and are not included below.',
+'--- EVENTS ---',
+...diagnostics.map(entry => `${entry.at} [${String(entry.level).toUpperCase()}] ${entry.event} ${JSON.stringify(entry.detail)}`)
+];
+return report.join('\n');
+}
+async function copyDiagnostics() {
+diag('info', 'diagnostic_copy_requested', { entries: diagnostics.length, clipboardApi: Boolean(navigator.clipboard?.writeText) });
+const text = diagnosticReport();
+let copied = false;
+let method = '';
+try {
+if (navigator.clipboard?.writeText && window.isSecureContext) {
+await navigator.clipboard.writeText(text);
+copied = true;
+method = 'navigator.clipboard';
+}
+} catch (error) {
+diag('warn', 'clipboard_api_failed', { name: error?.name, message: error?.message });
+}
+if (!copied) {
+try {
+const area = document.createElement('textarea');
+area.value = text;
+area.setAttribute('readonly', '');
+area.style.position = 'fixed';
+area.style.opacity = '0';
+area.style.pointerEvents = 'none';
+area.style.left = '-9999px';
+document.body.appendChild(area);
+area.focus();
+area.select();
+area.setSelectionRange(0, area.value.length);
+copied = document.execCommand('copy');
+method = copied ? 'execCommand' : '';
+area.remove();
+} catch (error) {
+diag('error', 'clipboard_fallback_failed', { name: error?.name, message: error?.message });
+}
+}
+if (copied) {
+diag('info', 'diagnostic_copy_succeeded', { method, characters: text.length });
+showToast('Diagnostic log copied');
+const old = el.log.textContent;
+el.log.textContent = '✓';
+setTimeout(() => { el.log.textContent = old || 'LOG'; }, 1200);
+} else {
+diag('error', 'diagnostic_copy_failed');
+showToast('Could not copy log — Safari blocked clipboard access');
+}
 }
 const observationAge = x => x.ts ? Date.now() - x.ts : Number.POSITIVE_INFINITY;
 const usable = x => !x.missing && x.qc !== 0 && observationAge(x) <= MAX_OBSERVATION_AGE;
@@ -178,21 +305,37 @@ toastTimer = setTimeout(() => el.toast.classList.remove('show'), 3000);
 function formatTime(stamp) {
 return new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' }).format(new Date(stamp));
 }
+function stationResultMatches(station, result) {
+const id = String(result?.id || '').trim().toUpperCase();
+return station.ids.some(alias => alias.toUpperCase() === id);
+}
 function normalizeResponse(json) {
 const response = Array.isArray(json?.response) ? json.response : json?.response ? [json.response] : [];
-return STATIONS.map(([id, lat, lon]) => {
-const result = response.find(item => String(item?.id || '').toUpperCase() === id.toUpperCase());
+const used = new Set();
+const normalized = STATIONS.map(station => {
+let resultIndex = response.findIndex((item, index) => !used.has(index) && stationResultMatches(station, item));
+if (resultIndex >= 0) used.add(resultIndex);
+const result = resultIndex >= 0 ? response[resultIndex] : null;
 const ob = result?.ob || {};
 const seconds = numberOrNull(ob.timestamp);
 const parsedISO = Date.parse(ob.dateTimeISO || '');
 return {
-id, lat, lon, missing: !result,
+id: station.label, aliases: station.ids, lat: station.lat, lon: station.lon,
+apiId: result?.id || '', source: result?.dataSource || '', place: result?.place?.name || '',
+apiLat: numberOrNull(result?.loc?.lat), apiLon: numberOrNull(result?.loc?.long), missing: !result,
 ts: seconds !== null ? seconds * 1000 : Number.isFinite(parsedISO) ? parsedISO : 0,
 temp: numberOrNull(ob.tempF), humidity: numberOrNull(ob.humidity), pressure: numberOrNull(ob.pressureMB),
 wind: numberOrNull(ob.windSpeedMPH), dir: numberOrNull(ob.windDirDEG), gust: numberOrNull(ob.windGustMPH),
 precip: numberOrNull(ob.precipIN), qc: numberOrNull(ob.QCcode), trust: numberOrNull(ob.trustFactor)
 };
 });
+const unmatched = response.filter((_, index) => !used.has(index)).map(item => ({ id: item?.id || '', source: item?.dataSource || '', lat: item?.loc?.lat ?? null, lon: item?.loc?.long ?? null }));
+diag('info', 'station_normalization', {
+apiResultCount: response.length,
+matched: normalized.map(item => ({ displayId: item.id, apiId: item.apiId || null, source: item.source || null, missing: item.missing, ageMinutes: item.ts ? Math.round((Date.now() - item.ts) / 6000) / 10 : null, qc: item.qc, trust: item.trust, tempF: item.temp, humidity: item.humidity, pressureMB: item.pressure, windMPH: item.wind, precipIN: item.precip })),
+unmatched
+});
+return normalized;
 }
 function writeCache(items) {
 try { localStorage.setItem(STORAGE_PREFIX + 'cache', JSON.stringify({ at: Date.now(), data: items })); }
@@ -257,38 +400,54 @@ let timedOut = false;
 const timeout = setTimeout(() => { timedOut = true; controller.abort(); }, REQUEST_TIMEOUT);
 el.refresh.classList.add('busy');
 setStatus('Updating stations…');
+const requestQuery = QUERY_IDS.map(id => `id:${id}`).join(';');
 const params = new URLSearchParams({
-query: STATIONS.map(station => `id:${station[0]}`).join(';'),
-filter: 'allstations,precise',
-limit: String(STATIONS.length),
+query: requestQuery,
+filter: 'allstations',
+limit: String(Math.max(QUERY_IDS.length, STATIONS.length)),
 fields: FIELDS,
 client_id: credentials.id,
 client_secret: credentials.secret
 });
+diag('info', 'request_start', { sequence, endpoint: API, query: requestQuery, filter: 'allstations', limit: Math.max(QUERY_IDS.length, STATIONS.length), fields: FIELDS.split(','), key: keyDiagnostics() });
 try {
 const response = await fetch(`${API}?${params}`, {
 cache: 'no-store', credentials: 'omit', signal: controller.signal,
 headers: { Accept: 'application/json' }
 });
+const headerNames = ['x-cost-endpoint','x-cost-tokens','x-cost-multiplier','x-cost-multipliers','x-ratelimit-limit-minute','x-ratelimit-remaining-minute','x-ratelimit-limit-period','x-ratelimit-remaining-period','x-ratelimit-reset-period'];
+const responseHeaders = Object.fromEntries(headerNames.map(name => [name, response.headers.get(name)]).filter(([, value]) => value !== null));
+diag('info', 'response_received', { sequence, status: response.status, ok: response.ok, redirected: response.redirected, type: response.type, contentType: response.headers.get('content-type'), headers: responseHeaders });
 const text = await response.text();
 let json;
 try { json = JSON.parse(text); }
-catch { throw Object.assign(new Error(`Xweather returned an unreadable response (HTTP ${response.status})`), { status: response.status }); }
+catch {
+diag('error', 'response_json_parse_failed', { sequence, status: response.status, bodyLength: text.length, bodyStart: redactText(text.slice(0, 500)) });
+throw Object.assign(new Error(`Xweather returned an unreadable response (HTTP ${response.status})`), { status: response.status });
+}
 if (sequence !== requestSequence) return;
-if (!response.ok || json?.success === false) throw apiError(json, response);
+const apiResults = Array.isArray(json?.response) ? json.response : json?.response ? [json.response] : [];
+diag(json?.error ? 'warn' : 'info', 'api_payload', { sequence, success: json?.success, error: json?.error || null, resultCount: apiResults.length, returnedIds: apiResults.map(item => ({ id: item?.id || '', source: item?.dataSource || '' })) });
+if (!response.ok || json?.success === false || (json?.error && apiResults.length === 0)) throw apiError(json, response);
 const normalized = normalizeResponse(json);
 const goodCount = normalized.filter(usable).length;
-if (!goodCount) throw new Error('No current station observations returned');
+if (!goodCount) {
+const returnedIds = apiResults.map(item => item?.id).filter(Boolean);
+diag('error', 'no_usable_observations', { returnedIds, normalized: normalized.map(item => ({ id: item.id, apiId: item.apiId, missing: item.missing, ageMinutes: item.ts ? Math.round(observationAge(item) / 6000) / 10 : null, qc: item.qc, trust: item.trust })) });
+throw new Error(returnedIds.length ? 'Stations returned, but none had usable current observations' : 'No current station observations returned');
+}
 data = normalized;
 lastSuccessfulRefresh = Date.now();
 authBlocked = false;
 writeCache(data);
 render();
 setStatus(`${goodCount} station${goodCount === 1 ? '' : 's'} · Updated ${formatTime(lastSuccessfulRefresh)}`, goodCount === STATIONS.length ? 'live' : 'warn');
+diag('info', 'load_success', { sequence, goodCount, configuredCount: STATIONS.length, updatedAt: new Date(lastSuccessfulRefresh).toISOString() });
 } catch (error) {
 if (sequence !== requestSequence) return;
 const message = timedOut ? 'Xweather request timed out' : error?.name === 'AbortError' ? 'Xweather request cancelled' : (error?.message || 'Unable to load weather');
 const authError = isAuthError(error);
+diag('error', 'load_failed', { sequence, timedOut, authError, name: error?.name, message, status: error?.status || null, code: error?.code || null, online: navigator.onLine });
 authBlocked = authError;
 showCachedOrError(message, authError);
 if (authError && !el.setup.open) {
@@ -376,11 +535,13 @@ catch { detailTrigger.focus(); }
 detailTrigger = null;
 });
 el.settings.addEventListener('click', () => {
+diag('info', 'settings_opened', { key: keyDiagnostics() });
 el.apiKey.value = getApiKey();
 if (!el.setup.open) el.setup.showModal();
 });
 el.setupClose.addEventListener('click', () => el.setup.close());
 el.clear.addEventListener('click', () => {
+diag('info', 'api_key_cleared');
 clearApiKey();
 authBlocked = false;
 el.apiKey.value = '';
@@ -390,6 +551,7 @@ showToast('Saved API key cleared');
 el.form.addEventListener('submit', event => {
 event.preventDefault();
 const parsed = parseCombinedKey(el.apiKey.value);
+diag(parsed ? 'info' : 'warn', 'api_key_submitted', { validCombinedFormat: Boolean(parsed), combinedLength: String(el.apiKey.value || '').trim().length, separatorIndex: String(el.apiKey.value || '').trim().indexOf('_') });
 if (!parsed) {
 showToast('Paste the complete Xweather API key, including its underscore');
 el.apiKey.focus();
@@ -402,21 +564,33 @@ if (!persisted) showToast('API key loaded for this session only');
 load();
 });
 el.refresh.addEventListener('click', () => {
+diag('info', 'manual_refresh');
 authBlocked = false;
 load({ promptForKey: true });
 });
 document.addEventListener('visibilitychange', () => {
+diag('info', 'visibility_changed', { state: document.visibilityState, secondsSinceSuccess: lastSuccessfulRefresh ? Math.round((Date.now() - lastSuccessfulRefresh) / 1000) : null });
 if (!document.hidden && getApiKey() && !authBlocked && Date.now() - lastSuccessfulRefresh > REFRESH_INTERVAL) load();
 });
 setInterval(() => {
 if (!document.hidden && getApiKey() && !authBlocked && Date.now() - lastSuccessfulRefresh > REFRESH_INTERVAL) load();
 }, 30000);
+el.log.addEventListener('click', copyDiagnostics);
+window.addEventListener('error', event => diag('error', 'window_error', { message: event.message, filename: event.filename, line: event.lineno, column: event.colno, error: event.error?.message }));
+window.addEventListener('unhandledrejection', event => diag('error', 'unhandled_rejection', { reason: event.reason?.message || String(event.reason || '') }));
+window.addEventListener('online', () => diag('info', 'network_online'));
+window.addEventListener('offline', () => diag('warn', 'network_offline'));
+restoreDiagnostics();
+diag('info', 'app_start', { version: APP_VERSION, page: `${location.origin}${location.pathname}`, hostname: location.hostname, referrer: document.referrer || null, secureContext: window.isSecureContext, online: navigator.onLine, visibility: document.visibilityState, userAgent: navigator.userAgent, viewport: { width: innerWidth, height: innerHeight, dpr: devicePixelRatio || 1 }, screen: { width: screen.width, height: screen.height }, key: keyDiagnostics(), stationAliases: STATIONS.map(s => ({ label: s.label, ids: s.ids })) });
 renderShell();
 const cached = readCache();
 if (cached) {
 data = cached.data;
 render();
 setStatus(`Cached · ${formatTime(cached.at)}`, 'warn');
+diag('info', 'cache_restored', { cachedAt: new Date(Number(cached.at)).toISOString(), ageMinutes: Math.round((Date.now() - Number(cached.at)) / 6000) / 10, rows: cached.data.length });
+} else {
+diag('info', 'cache_empty');
 }
 load({ promptForKey: true });
 })();</script></body></html>
